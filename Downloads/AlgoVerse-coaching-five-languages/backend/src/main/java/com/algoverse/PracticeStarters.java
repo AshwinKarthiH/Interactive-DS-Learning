@@ -1,0 +1,7 @@
+package com.algoverse;
+import java.util.*;
+public final class PracticeStarters {
+ public static Map<String,String> forProblem(Data.Problem p){String description="Arguments are a JSON array: "+(p.examples.isEmpty()?"read the examples below":p.examples.get(0).getOrDefault("input","read the examples"));description=description.replace("\n"," ").replace("\r"," ").replace("*/","* /");
+  return Map.of("javascript",p.jsStarter,"python","# "+description+"\n# Return a list, number or boolean matching the expected output.\ndef solve(args):\n    # args[0] is the first argument; args[1] is the second, if present.\n    # Write your algorithm here.\n    return None\n","cpp","// "+description+"\n// json supports arrays, numbers, strings and booleans.\njson solve(const json& args) {\n    // Example: auto values = args.at(0).get<std::vector<int>>();\n    // Write your algorithm here and return its JSON result.\n    return nullptr;\n}\n","c","/* "+description+" */\n/* Use cJSON_GetArrayItem(args, 0) to read the first argument. */\ncJSON *solve(const cJSON *args) {\n    /* Write your algorithm here. Return a newly allocated cJSON value. */\n    return cJSON_CreateNull();\n}\n","java","import java.util.*;\n\npublic class Solution {\n    // "+description+"\n    // JSON arrays become List<Object>; numbers become Number.\n    public static Object solve(List<Object> args) {\n        // Example: List<?> values = (List<?>) args.get(0);\n        // Write your algorithm here. Return a List, Number, Boolean or String.\n        return null;\n    }\n}\n");
+ }
+}

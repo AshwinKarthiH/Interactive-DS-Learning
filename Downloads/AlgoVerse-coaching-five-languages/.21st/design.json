@@ -1,0 +1,18 @@
+{
+  "project": "AlgoVerse",
+  "framework": "vanilla HTML/CSS/JavaScript",
+  "tokens": "dashboard.css",
+  "decisions": [
+    "Preserve dark purple/cyan dashboard and existing controls.",
+    "Use structure-specific SVG/DOM diagrams inside one scrollable stage.",
+    "Explain each lesson with a short analogy, three steps, and current-step narration.",
+    "Use catalog-derived navigation across all nine topic families.",
+    "User reference: title and simple explanation above whiteboard, code, and algorithm columns.",
+    "Automatically collapse the desktop sidebar after topic selection; close the menu on mobile.",
+    "Keep code highlights, narration, inspector and counters synchronized during playback and timeline seeking.",
+    "Floating handwriting sheet: 42% white background, 3px blur, transparent canvas, opaque dark ink and 88% white toolbar.",
+    "Dashboard coaching shows a progress-based roadmap; practice offers incremental hints and per-language draft templates with explicit runtime readiness.",
+    "Cleaner dark UI: greeting and metrics before next-action roadmap; compact save toast, progressive disclosure for account, constraints and inspector; quieter surfaces, consistent gaps, responsive editor and searchable admin lists.",
+    "User selected the exact AlgoVerse-glass-notes page background: #0a0a0f with its original purple/cyan particle animation and click ripples; retain current layouts."
+  ]
+}

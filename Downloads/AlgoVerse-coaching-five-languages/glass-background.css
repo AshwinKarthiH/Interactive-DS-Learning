@@ -1,0 +1,3 @@
+/* Restore the background from AlgoVerse-glass-notes. */
+body { background: #0a0a0f; }
+#particleCanvas, .click-ripple { display: block; }

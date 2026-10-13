@@ -1,0 +1,7 @@
+backend/.env
+backend/.tools/
+backend/.data/
+backend/target/
+node_modules/
+__pycache__/
+*.log

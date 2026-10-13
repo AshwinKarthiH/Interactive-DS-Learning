@@ -1,0 +1,1108 @@
+{
+  "problems": [
+    {
+      "id": "two-sum",
+      "number": 1,
+      "title": "Two Sum",
+      "difficulty": "Easy",
+      "description": "Given an array of integers <code>nums</code> and an integer <code>target</code>, return <em>indices of the two numbers such that they add up to <code>target</code></em>.<br><br>You may assume that each input would have <strong>exactly one solution</strong>, and you may not use the same element twice. You can return the answer in any order.",
+      "hint": "Use a Hash Map to store numbers you have already visited and their indices: map.set(nums[i], i). For each number, check if (target - nums[i]) already exists in the map.",
+      "jsStarter": "/**\n * LeetCode #1: Two Sum\n * @param {number[]} nums\n * @param {number} target\n * @return {number[]}\n */\nfunction twoSum(nums, target) {\n    const map = new Map();\n    for (let i = 0; i < nums.length; i++) {\n        const complement = target - nums[i];\n        if (map.has(complement)) {\n            return [map.get(complement), i];\n        }\n        map.set(nums[i], i);\n    }\n    return [];\n}",
+      "fnName": "twoSum",
+      "tags": [
+        "LeetCode #1",
+        "Arrays",
+        "Hash Map"
+      ],
+      "constraints": [
+        "2 <= nums.length <= 10^4",
+        "-10^9 <= nums[i] <= 10^9",
+        "-10^9 <= target <= 10^9",
+        "Only one valid answer exists.",
+        "Follow-up: Can you come up with an algorithm that is less than O(n²) time complexity?"
+      ],
+      "examples": [
+        {
+          "input": "nums = [2, 7, 11, 15], target = 9",
+          "output": "[0, 1]",
+          "explanation": "Because nums[0] + nums[1] == 9, we return [0, 1]."
+        },
+        {
+          "input": "nums = [3, 2, 4], target = 6",
+          "output": "[1, 2]",
+          "explanation": "nums[1] + nums[2] == 2 + 4 == 6, we return [1, 2]."
+        },
+        {
+          "input": "nums = [3, 3], target = 6",
+          "output": "[0, 1]",
+          "explanation": "nums[0] + nums[1] == 3 + 3 == 6, we return [0, 1]."
+        }
+      ],
+      "active": true,
+      "unordered": true,
+      "tests": [
+        {
+          "args": [
+            [
+              2,
+              7,
+              11,
+              15
+            ],
+            9
+          ],
+          "expected": [
+            0,
+            1
+          ],
+          "hidden": false
+        },
+        {
+          "args": [
+            [
+              3,
+              2,
+              4
+            ],
+            6
+          ],
+          "expected": [
+            1,
+            2
+          ],
+          "hidden": false
+        },
+        {
+          "args": [
+            [
+              3,
+              3
+            ],
+            6
+          ],
+          "expected": [
+            0,
+            1
+          ],
+          "hidden": false
+        },
+        {
+          "args": [
+            [
+              -2,
+              4,
+              8,
+              1
+            ],
+            6
+          ],
+          "expected": [
+            0,
+            2
+          ],
+          "hidden": true
+        },
+        {
+          "args": [
+            [
+              0,
+              4,
+              0
+            ],
+            0
+          ],
+          "expected": [
+            0,
+            2
+          ],
+          "hidden": true
+        }
+      ]
+    },
+    {
+      "id": "reverse-linked-list",
+      "number": 206,
+      "title": "Reverse a Linked List",
+      "difficulty": "Easy",
+      "description": "Given the head of a singly linked list represented as an array of values, reverse the list, and return <em>the reversed array of values</em>.",
+      "hint": "Use three pointers (prev = null, curr = head, next) or iteratively reverse the links in a single pass!",
+      "jsStarter": "/**\n * LeetCode #206: Reverse Linked List\n * @param {number[]} head\n * @return {number[]}\n */\nfunction reverseList(head) {\n    const reversed = [];\n    for (let i = head.length - 1; i >= 0; i--) {\n        reversed.push(head[i]);\n    }\n    return reversed;\n}",
+      "fnName": "reverseList",
+      "tags": [
+        "LeetCode #206",
+        "Linked List",
+        "Pointers"
+      ],
+      "constraints": [
+        "The number of nodes in the list is the range [0, 5000].",
+        "-5000 <= Node.val <= 5000"
+      ],
+      "examples": [
+        {
+          "input": "head = [1, 2, 3, 4, 5]",
+          "output": "[5, 4, 3, 2, 1]",
+          "explanation": "Reversing list 1->2->3->4->5 produces 5->4->3->2->1."
+        },
+        {
+          "input": "head = [1, 2]",
+          "output": "[2, 1]",
+          "explanation": "Reversing 1->2 produces 2->1."
+        }
+      ],
+      "active": true,
+      "unordered": false,
+      "tests": [
+        {
+          "args": [
+            [
+              1,
+              2,
+              3,
+              4,
+              5
+            ]
+          ],
+          "expected": [
+            5,
+            4,
+            3,
+            2,
+            1
+          ],
+          "hidden": false
+        },
+        {
+          "args": [
+            [
+              1,
+              2
+            ]
+          ],
+          "expected": [
+            2,
+            1
+          ],
+          "hidden": false
+        },
+        {
+          "args": [
+            []
+          ],
+          "expected": [],
+          "hidden": false
+        },
+        {
+          "args": [
+            []
+          ],
+          "expected": [],
+          "hidden": true
+        },
+        {
+          "args": [
+            [
+              5
+            ]
+          ],
+          "expected": [
+            5
+          ],
+          "hidden": true
+        }
+      ]
+    },
+    {
+      "id": "valid-parentheses",
+      "number": 20,
+      "title": "Valid Parentheses",
+      "difficulty": "Easy",
+      "description": "Given a string <code>s</code> containing just the characters <code>'('</code>, <code>')'</code>, <code>'{'</code>, <code>'}'</code>, <code>'['</code> and <code>']'</code>, determine if the input string is valid.<br><br>An input string is valid if open brackets are closed by the same type of brackets in the correct order.",
+      "hint": "Use a Stack! When encountering an opening bracket, push it. When encountering a closing bracket, check if it matches the top of the stack.",
+      "jsStarter": "/**\n * LeetCode #20: Valid Parentheses\n * @param {string} s\n * @return {boolean}\n */\nfunction isValid(s) {\n    const stack = [];\n    const pairs = { ')': '(', '}': '{', ']': '[' };\n    for (const char of s) {\n        if (char === '(' || char === '{' || char === '[') {\n            stack.push(char);\n        } else {\n            if (stack.pop() !== pairs[char]) return false;\n        }\n    }\n    return stack.length === 0;\n}",
+      "fnName": "isValid",
+      "tags": [
+        "LeetCode #20",
+        "Stack",
+        "String"
+      ],
+      "constraints": [
+        "1 <= s.length <= 10^4",
+        "s consists of parentheses only \"()[]{}\""
+      ],
+      "examples": [
+        {
+          "input": "s = \"()\"",
+          "output": "true",
+          "explanation": "Matching pair of parentheses."
+        },
+        {
+          "input": "s = \"()[]{}\"",
+          "output": "true",
+          "explanation": "All three pairs match in proper order."
+        },
+        {
+          "input": "s = \"(]\"",
+          "output": "false",
+          "explanation": "Mismatched closing bracket."
+        }
+      ],
+      "active": true,
+      "unordered": false,
+      "tests": [
+        {
+          "args": [
+            "()"
+          ],
+          "expected": true,
+          "hidden": false
+        },
+        {
+          "args": [
+            "()[]{}"
+          ],
+          "expected": true,
+          "hidden": false
+        },
+        {
+          "args": [
+            "(]"
+          ],
+          "expected": false,
+          "hidden": false
+        },
+        {
+          "args": [
+            "([)]"
+          ],
+          "expected": false,
+          "hidden": true
+        },
+        {
+          "args": [
+            ""
+          ],
+          "expected": true,
+          "hidden": true
+        }
+      ]
+    },
+    {
+      "id": "merge-sorted-lists",
+      "number": 21,
+      "title": "Merge Two Sorted Lists",
+      "difficulty": "Easy",
+      "description": "You are given the heads of two sorted linked lists represented as arrays <code>list1</code> and <code>list2</code>.<br><br>Merge the two lists into one <strong>sorted</strong> list and return it.",
+      "hint": "Use two pointers comparing list1[i] and list2[j], appending the smaller element to your result.",
+      "jsStarter": "/**\n * LeetCode #21: Merge Two Sorted Lists\n * @param {number[]} list1\n * @param {number[]} list2\n * @return {number[]}\n */\nfunction mergeTwoLists(list1, list2) {\n    const res = [];\n    let i = 0, j = 0;\n    while (i < list1.length && j < list2.length) {\n        if (list1[i] <= list2[j]) res.push(list1[i++]);\n        else res.push(list2[j++]);\n    }\n    while (i < list1.length) res.push(list1[i++]);\n    while (j < list2.length) res.push(list2[j++]);\n    return res;\n}",
+      "fnName": "mergeTwoLists",
+      "tags": [
+        "LeetCode #21",
+        "Linked List",
+        "Recursion"
+      ],
+      "constraints": [
+        "The number of nodes in both lists is in the range [0, 50].",
+        "-100 <= Node.val <= 100",
+        "Both list1 and list2 are sorted in non-decreasing order."
+      ],
+      "examples": [
+        {
+          "input": "list1 = [1, 2, 4], list2 = [1, 3, 4]",
+          "output": "[1, 1, 2, 3, 4, 4]",
+          "explanation": "Elements merged in ascending order."
+        },
+        {
+          "input": "list1 = [], list2 = []",
+          "output": "[]",
+          "explanation": "Both lists are empty."
+        }
+      ],
+      "active": true,
+      "unordered": false,
+      "tests": [
+        {
+          "args": [
+            [
+              1,
+              2,
+              4
+            ],
+            [
+              1,
+              3,
+              4
+            ]
+          ],
+          "expected": [
+            1,
+            1,
+            2,
+            3,
+            4,
+            4
+          ],
+          "hidden": false
+        },
+        {
+          "args": [
+            [],
+            []
+          ],
+          "expected": [],
+          "hidden": false
+        },
+        {
+          "args": [
+            [],
+            [
+              0
+            ]
+          ],
+          "expected": [
+            0
+          ],
+          "hidden": false
+        },
+        {
+          "args": [
+            [],
+            [
+              2,
+              3
+            ]
+          ],
+          "expected": [
+            2,
+            3
+          ],
+          "hidden": true
+        },
+        {
+          "args": [
+            [
+              1,
+              2
+            ],
+            [
+              1,
+              3
+            ]
+          ],
+          "expected": [
+            1,
+            1,
+            2,
+            3
+          ],
+          "hidden": true
+        }
+      ]
+    },
+    {
+      "id": "max-subarray",
+      "number": 53,
+      "title": "Maximum Subarray (Kadane's)",
+      "difficulty": "Medium",
+      "description": "Given an integer array <code>nums</code>, find the subarray with the largest sum, and return <em>its sum</em>.",
+      "hint": "Kadane's Algorithm: Maintain currentMax = max(nums[i], currentMax + nums[i]), and update maxSoFar.",
+      "jsStarter": "/**\n * LeetCode #53: Maximum Subarray\n * @param {number[]} nums\n * @return {number}\n */\nfunction maxSubArray(nums) {\n    let maxSoFar = nums[0];\n    let currentMax = nums[0];\n    for (let i = 1; i < nums.length; i++) {\n        currentMax = Math.max(nums[i], currentMax + nums[i]);\n        maxSoFar = Math.max(maxSoFar, currentMax);\n    }\n    return maxSoFar;\n}",
+      "fnName": "maxSubArray",
+      "tags": [
+        "LeetCode #53",
+        "Arrays",
+        "Dynamic Programming"
+      ],
+      "constraints": [
+        "1 <= nums.length <= 10^5",
+        "-10^4 <= nums[i] <= 10^4"
+      ],
+      "examples": [
+        {
+          "input": "nums = [-2, 1, -3, 4, -1, 2, 1, -5, 4]",
+          "output": "6",
+          "explanation": "The subarray [4, -1, 2, 1] has the largest sum 6."
+        },
+        {
+          "input": "nums = [1]",
+          "output": "1",
+          "explanation": "Single element array."
+        },
+        {
+          "input": "nums = [5, 4, -1, 7, 8]",
+          "output": "23",
+          "explanation": "The subarray [5, 4, -1, 7, 8] has the largest sum 23."
+        }
+      ],
+      "active": true,
+      "unordered": false,
+      "tests": [
+        {
+          "args": [
+            [
+              -2,
+              1,
+              -3,
+              4,
+              -1,
+              2,
+              1,
+              -5,
+              4
+            ]
+          ],
+          "expected": 6,
+          "hidden": false
+        },
+        {
+          "args": [
+            [
+              1
+            ]
+          ],
+          "expected": 1,
+          "hidden": false
+        },
+        {
+          "args": [
+            [
+              5,
+              4,
+              -1,
+              7,
+              8
+            ]
+          ],
+          "expected": 23,
+          "hidden": false
+        },
+        {
+          "args": [
+            [
+              -5,
+              -2,
+              -8
+            ]
+          ],
+          "expected": -2,
+          "hidden": true
+        },
+        {
+          "args": [
+            [
+              7
+            ]
+          ],
+          "expected": 7,
+          "hidden": true
+        }
+      ]
+    },
+    {
+      "id": "best-time-stock",
+      "number": 121,
+      "title": "Best Time to Buy and Sell Stock",
+      "difficulty": "Easy",
+      "description": "You are given an array <code>prices</code> where <code>prices[i]</code> is the price of a given stock on the <code>i-th</code> day.<br><br>Return <em>the maximum profit you can achieve</em> by choosing a day to buy and a later day to sell. If no profit can be achieved, return <code>0</code>.",
+      "hint": "Keep track of minPrice seen so far. At each day, calculate profit = price - minPrice.",
+      "jsStarter": "/**\n * LeetCode #121: Best Time to Buy and Sell Stock\n * @param {number[]} prices\n * @return {number}\n */\nfunction maxProfit(prices) {\n    let minPrice = Infinity;\n    let maxProfit = 0;\n    for (let price of prices) {\n        if (price < minPrice) minPrice = price;\n        else if (price - minPrice > maxProfit) maxProfit = price - minPrice;\n    }\n    return maxProfit;\n}",
+      "fnName": "maxProfit",
+      "tags": [
+        "LeetCode #121",
+        "Arrays",
+        "Two Pointers"
+      ],
+      "constraints": [
+        "1 <= prices.length <= 10^5",
+        "0 <= prices[i] <= 10^4"
+      ],
+      "examples": [
+        {
+          "input": "prices = [7, 1, 5, 3, 6, 4]",
+          "output": "5",
+          "explanation": "Buy on day 2 (price = 1) and sell on day 5 (price = 6), profit = 6 - 1 = 5."
+        },
+        {
+          "input": "prices = [7, 6, 4, 3, 1]",
+          "output": "0",
+          "explanation": "No transactions are done and max profit = 0."
+        }
+      ],
+      "active": true,
+      "unordered": false,
+      "tests": [
+        {
+          "args": [
+            [
+              7,
+              1,
+              5,
+              3,
+              6,
+              4
+            ]
+          ],
+          "expected": 5,
+          "hidden": false
+        },
+        {
+          "args": [
+            [
+              7,
+              6,
+              4,
+              3,
+              1
+            ]
+          ],
+          "expected": 0,
+          "hidden": false
+        },
+        {
+          "args": [
+            [
+              2,
+              4,
+              1
+            ]
+          ],
+          "expected": 2,
+          "hidden": false
+        },
+        {
+          "args": [
+            [
+              5,
+              4,
+              3
+            ]
+          ],
+          "expected": 0,
+          "hidden": true
+        },
+        {
+          "args": [
+            [
+              1,
+              6,
+              2,
+              8
+            ]
+          ],
+          "expected": 7,
+          "hidden": true
+        }
+      ]
+    },
+    {
+      "id": "climbing-stairs",
+      "number": 70,
+      "title": "Climbing Stairs",
+      "difficulty": "Easy",
+      "description": "You are climbing a staircase. It takes <code>n</code> steps to reach the top. Each time you can either climb <code>1</code> or <code>2</code> steps. In how many distinct ways can you climb to the top?",
+      "hint": "ways(n) = ways(n-1) + ways(n-2). This is equivalent to the Fibonacci sequence!",
+      "jsStarter": "/**\n * LeetCode #70: Climbing Stairs\n * @param {number} n\n * @return {number}\n */\nfunction climbStairs(n) {\n    if (n <= 2) return n;\n    let prev2 = 1, prev1 = 2;\n    for (let i = 3; i <= n; i++) {\n        let curr = prev1 + prev2;\n        prev2 = prev1;\n        prev1 = curr;\n    }\n    return prev1;\n}",
+      "fnName": "climbStairs",
+      "tags": [
+        "LeetCode #70",
+        "Dynamic Programming",
+        "Memoization"
+      ],
+      "constraints": [
+        "1 <= n <= 45"
+      ],
+      "examples": [
+        {
+          "input": "n = 2",
+          "output": "2",
+          "explanation": "1. 1 step + 1 step\\n2. 2 steps"
+        },
+        {
+          "input": "n = 3",
+          "output": "3",
+          "explanation": "1. 1 step + 1 step + 1 step\\n2. 1 step + 2 steps\\n3. 2 steps + 1 step"
+        }
+      ],
+      "active": true,
+      "unordered": false,
+      "tests": [
+        {
+          "args": [
+            2
+          ],
+          "expected": 2,
+          "hidden": false
+        },
+        {
+          "args": [
+            3
+          ],
+          "expected": 3,
+          "hidden": false
+        },
+        {
+          "args": [
+            4
+          ],
+          "expected": 5,
+          "hidden": false
+        },
+        {
+          "args": [
+            7
+          ],
+          "expected": 21,
+          "hidden": true
+        },
+        {
+          "args": [
+            10
+          ],
+          "expected": 89,
+          "hidden": true
+        }
+      ]
+    },
+    {
+      "id": "debug-sum",
+      "number": 1001,
+      "title": "Debug: Array Sum",
+      "difficulty": "Easy",
+      "description": "Fix the starting total in this function. Add every number exactly once.",
+      "hint": "The sum before reading any numbers should be zero.",
+      "jsStarter": "function sum(values) {\n  return values.reduce((total, value) => total + value, 1);\n}",
+      "fnName": "sum",
+      "tags": [
+        "Arrays",
+        "Debugging"
+      ],
+      "constraints": [
+        "At most 100 values."
+      ],
+      "examples": [
+        {
+          "input": "values = [1,2]",
+          "output": "3",
+          "explanation": "1 + 2 = 3"
+        }
+      ],
+      "tests": [
+        {
+          "args": [
+            [
+              1,
+              2
+            ]
+          ],
+          "expected": 3,
+          "hidden": false
+        },
+        {
+          "args": [
+            []
+          ],
+          "expected": 0,
+          "hidden": false
+        },
+        {
+          "args": [
+            [
+              -3,
+              1
+            ]
+          ],
+          "expected": -2,
+          "hidden": true
+        }
+      ],
+      "active": true,
+      "unordered": false
+    }
+  ],
+  "lessons": [
+    {
+      "id": "bubble",
+      "title": "Bubble Sort",
+      "summary": "Compare neighbors. If the left number is bigger, swap them. Keep going until a full pass makes no swaps.",
+      "steps": [
+        "Compare two neighbors.",
+        "Swap them if they are in the wrong order.",
+        "Repeat with the remaining numbers; stop when nothing changes."
+      ],
+      "active": true
+    },
+    {
+      "id": "selection",
+      "title": "Selection Sort",
+      "summary": "Find the smallest remaining number and put it in the next empty sorted position.",
+      "steps": [
+        "Scan the unsorted part for its smallest number.",
+        "Swap that number into the next sorted position.",
+        "Move the boundary one place to the right and repeat."
+      ],
+      "active": true
+    },
+    {
+      "id": "insertion",
+      "title": "Insertion Sort",
+      "summary": "Take one number and move it left until it fits among the already sorted numbers.",
+      "steps": [
+        "Take the next number.",
+        "Compare it with the number to its left.",
+        "Move it left while it is smaller; repeat for the next number."
+      ],
+      "active": true
+    },
+    {
+      "id": "merge",
+      "title": "Merge Sort",
+      "summary": "Split the list into smaller lists. Sort them, then combine them by always taking the smaller front number.",
+      "steps": [
+        "Split until each piece contains one number.",
+        "Compare the fronts of two pieces.",
+        "Take the smaller front until both pieces are merged."
+      ],
+      "active": true
+    },
+    {
+      "id": "quick",
+      "title": "Quick Sort",
+      "summary": "Pick a pivot. Move smaller numbers before it and larger numbers after it. Sort both sides the same way.",
+      "steps": [
+        "Choose the last number as the pivot.",
+        "Move smaller numbers to the left and place the pivot.",
+        "Repeat separately on the left and right sides."
+      ],
+      "active": true
+    },
+    {
+      "id": "radix",
+      "title": "Radix Sort",
+      "summary": "Sort numbers by their ones digit, then tens digit, then hundreds digit. Keep the order of numbers with the same digit.",
+      "steps": [
+        "Put numbers into digit buckets 0 through 9.",
+        "Collect the buckets in order without rearranging a bucket.",
+        "Repeat for the next digit until all digits are handled."
+      ],
+      "active": true
+    },
+    {
+      "id": "linear",
+      "title": "Linear Search",
+      "summary": "Check each number from left to right until you find the target or run out of numbers.",
+      "steps": [
+        "Check the current number.",
+        "If it matches, stop.",
+        "Otherwise move right; report not found at the end."
+      ],
+      "active": true
+    },
+    {
+      "id": "binary",
+      "title": "Binary Search",
+      "summary": "On a sorted list, check the middle. Keep only the half where your target can still be.",
+      "steps": [
+        "Start with a sorted list.",
+        "Check the middle number.",
+        "Keep the left or right half; repeat until found or the range is empty."
+      ],
+      "active": true
+    },
+    {
+      "id": "traverse",
+      "title": "Array Traversal",
+      "summary": "Visit every position in an array, in order.",
+      "steps": [
+        "Start at position zero.",
+        "Read the value at the current position.",
+        "Advance one position until the end."
+      ],
+      "active": true
+    },
+    {
+      "id": "sliding",
+      "title": "Sliding Window Sum",
+      "summary": "Keep a group of k neighbors. Slide it right by removing the old left value and adding the new right value.",
+      "steps": [
+        "Add the first k values.",
+        "Record the sum for this window.",
+        "Subtract the outgoing value, add the incoming value, and repeat."
+      ],
+      "active": true
+    },
+    {
+      "id": "two_pointer",
+      "title": "Two-Pointer Pair Sum",
+      "summary": "On sorted numbers, put one finger at each end. Move the left finger to increase the sum, or the right finger to decrease it.",
+      "steps": [
+        "Sort the values and place pointers at the ends.",
+        "Compare their sum with the target.",
+        "Move the appropriate pointer until a pair is found or pointers meet."
+      ],
+      "active": true
+    },
+    {
+      "id": "reverse_string",
+      "title": "Reverse a String",
+      "summary": "Swap the first and last letters, then work toward the middle.",
+      "steps": [
+        "Place pointers at the first and last letter.",
+        "Swap those two letters.",
+        "Move both pointers inward until they meet."
+      ],
+      "active": true
+    },
+    {
+      "id": "stack",
+      "title": "Stack: Push & Pop",
+      "summary": "Add and remove items at the top. The last item added is the first one removed.",
+      "steps": [
+        "Push the values onto the top one at a time.",
+        "Read the top value.",
+        "Pop values from the top until empty."
+      ],
+      "active": true
+    },
+    {
+      "id": "queue",
+      "title": "Queue: Enqueue & Dequeue",
+      "summary": "Add at the back and remove from the front. The first item added is the first one removed.",
+      "steps": [
+        "Enqueue each value at the back.",
+        "Read the front value.",
+        "Dequeue from the front until empty."
+      ],
+      "active": true
+    },
+    {
+      "id": "deque",
+      "title": "Deque: Both Ends",
+      "summary": "A deque lets you add or remove an item at either end.",
+      "steps": [
+        "Alternate adding values at the front and back.",
+        "Observe both ends.",
+        "Alternate removing from the front and back."
+      ],
+      "active": true
+    },
+    {
+      "id": "priority",
+      "title": "Priority Queue",
+      "summary": "Remove the smallest value first, regardless of when it arrived. A min-heap keeps the smallest value at its root.",
+      "steps": [
+        "Insert a value at the end of the heap.",
+        "Move it upward while it is smaller than its parent.",
+        "Remove the root, replace it with the last value, then repair the heap."
+      ],
+      "active": true
+    },
+    {
+      "id": "singly",
+      "title": "Singly Linked List",
+      "summary": "Each node stores a value and a link to the next node. Start at the head and follow the links.",
+      "steps": [
+        "Append a node by linking the previous tail to it.",
+        "Start at the head node.",
+        "Follow next links until reaching null."
+      ],
+      "active": true
+    },
+    {
+      "id": "doubly",
+      "title": "Doubly Linked List",
+      "summary": "Each node links to the next and previous node, so you can walk in either direction.",
+      "steps": [
+        "Connect a new node to the previous tail in both directions.",
+        "Follow next links from head to tail.",
+        "Follow previous links from tail to head."
+      ],
+      "active": true
+    },
+    {
+      "id": "circular",
+      "title": "Circular Linked List",
+      "summary": "The last node links back to the first node. Stop after a full round so you do not loop forever.",
+      "steps": [
+        "Link the values into a list.",
+        "Point the tail back to the head.",
+        "Follow exactly n links to complete one round."
+      ],
+      "active": true
+    },
+    {
+      "id": "bst",
+      "title": "Binary Search Tree",
+      "summary": "Smaller values go left and larger values go right. Follow that rule to insert or find a value.",
+      "steps": [
+        "Start at the root.",
+        "Compare: smaller goes left, larger goes right.",
+        "Insert at an empty link or stop at the matching value."
+      ],
+      "active": true
+    },
+    {
+      "id": "bfs_tree",
+      "title": "Tree Breadth-First Traversal",
+      "summary": "Visit the root, then its children, then their children. Use a queue to remember the next nodes.",
+      "steps": [
+        "Put the root in a queue.",
+        "Remove and visit the front node.",
+        "Add its children to the back and repeat."
+      ],
+      "active": true
+    },
+    {
+      "id": "dfs_tree",
+      "title": "Tree Depth-First Traversal",
+      "summary": "Visit a node, explore its left branch completely, then explore its right branch.",
+      "steps": [
+        "Visit the current node.",
+        "Explore its left child recursively.",
+        "Explore its right child recursively."
+      ],
+      "active": true
+    },
+    {
+      "id": "avl",
+      "title": "AVL Tree Insertion",
+      "summary": "An AVL tree keeps its left and right heights within one level. Rotate an unbalanced branch after inserting.",
+      "steps": [
+        "Insert using the binary-search-tree rule.",
+        "Check the left and right heights on the way back up.",
+        "Rotate the leaning branch; use two rotations for a zigzag."
+      ],
+      "active": true
+    },
+    {
+      "id": "redblack",
+      "title": "Red-Black Tree Insertion",
+      "summary": "Use red and black node colors to keep search paths roughly balanced. Repair colors and rotate after inserting.",
+      "steps": [
+        "Insert the new value as a red node.",
+        "Fix two red nodes in a row by recoloring or rotating.",
+        "Keep the root black and equal black counts along every path."
+      ],
+      "active": true
+    },
+    {
+      "id": "heap",
+      "title": "Min-Heap Construction",
+      "summary": "A parent is never larger than its children. Insert at the end and move a small value upward until the rule holds.",
+      "steps": [
+        "Insert at the next open leaf.",
+        "Compare with its parent.",
+        "Swap upward while the parent is bigger."
+      ],
+      "active": true
+    },
+    {
+      "id": "bfs_graph",
+      "title": "Graph Breadth-First Search",
+      "summary": "Visit nearby nodes first. A queue makes you finish one distance level before moving farther away.",
+      "steps": [
+        "Mark the start and put it in a queue.",
+        "Visit the front node.",
+        "Queue its unvisited neighbors; repeat."
+      ],
+      "active": true
+    },
+    {
+      "id": "dfs_graph",
+      "title": "Graph Depth-First Search",
+      "summary": "Follow one path as far as possible. Mark visited nodes so cycles do not trap you.",
+      "steps": [
+        "Mark and visit the current node.",
+        "Recursively explore an unvisited neighbor.",
+        "Backtrack and try the next neighbor."
+      ],
+      "active": true
+    },
+    {
+      "id": "dijkstra",
+      "title": "Dijkstra Shortest Paths",
+      "summary": "Repeatedly choose the unvisited node with the smallest known distance. Check whether going through it improves a neighbor’s distance.",
+      "steps": [
+        "Set the start distance to zero and others to infinity.",
+        "Choose the unvisited node with the smallest distance.",
+        "Update its neighbors with cheaper routes; repeat."
+      ],
+      "active": true
+    },
+    {
+      "id": "topological",
+      "title": "Topological Sort",
+      "summary": "Complete tasks that have no unfinished prerequisites. Remove their outgoing links to unlock more tasks.",
+      "steps": [
+        "Count each node’s incoming edges.",
+        "Queue nodes with zero incoming edges.",
+        "Remove one, reduce its neighbors’ counts, and queue newly unlocked nodes."
+      ],
+      "active": true
+    },
+    {
+      "id": "fibonacci",
+      "title": "Fibonacci: Tabulation",
+      "summary": "Save the first two answers, then build each next answer by adding the previous two.",
+      "steps": [
+        "Store F(0) = 0 and F(1) = 1.",
+        "For each i, calculate F(i) = F(i−1) + F(i−2).",
+        "Read the saved answer at n."
+      ],
+      "active": true
+    },
+    {
+      "id": "memoization",
+      "title": "Fibonacci: Memoization",
+      "summary": "Ask for the answer recursively. When a smaller answer is computed, save it so later calls can reuse it.",
+      "steps": [
+        "Ask for F(n).",
+        "If an answer is saved, reuse it.",
+        "Otherwise solve the two smaller problems, add them, and save the result."
+      ],
+      "active": true
+    },
+    {
+      "id": "knapsack",
+      "title": "0/1 Knapsack",
+      "summary": "For each item and capacity, choose the better of skipping the item or taking it once.",
+      "steps": [
+        "Start with no items and zero value.",
+        "For each item, compare skipping it with taking it if it fits.",
+        "Save the better answer; use the last row at full capacity."
+      ],
+      "active": true
+    },
+    {
+      "id": "hash_chaining",
+      "title": "Hash Map: Chaining",
+      "summary": "A hash function chooses a bucket. If several keys choose the same bucket, keep them together in a small list. This map saves a frequency count for each key.",
+      "steps": [
+        "Calculate bucket = key modulo 7.",
+        "Check that bucket for an existing key.",
+        "Insert a new key into its bucket, then search the target bucket."
+      ],
+      "active": true
+    },
+    {
+      "id": "hash_probing",
+      "title": "Hash Map: Linear Probing",
+      "summary": "If a key’s chosen slot is full, try the next slot until finding a free one. Search follows the same path. This map saves a frequency count for each key.",
+      "steps": [
+        "Hash the key into the table.",
+        "If occupied, move one slot forward, wrapping around.",
+        "Insert in a free slot; search until matching or finding an empty slot."
+      ],
+      "active": true
+    },
+    {
+      "id": "hashset",
+      "title": "Hash Set: Unique Values",
+      "summary": "Store each value once. Hashing lets you check whether a value is already present.",
+      "steps": [
+        "Hash each value to its bucket.",
+        "Check whether it is already stored.",
+        "Skip duplicates and keep only new values."
+      ],
+      "active": true
+    }
+  ]
+}

@@ -1,0 +1,142 @@
+{
+  "bubble": {
+    "python": "bubble_sort",
+    "native": "bubbleSort"
+  },
+  "selection": {
+    "python": "selection_sort",
+    "native": "selectionSort"
+  },
+  "insertion": {
+    "python": "insertion_sort",
+    "native": "insertionSort"
+  },
+  "merge": {
+    "python": "merge_sort",
+    "native": "mergeSort"
+  },
+  "quick": {
+    "python": "quick_sort",
+    "native": "quickSort"
+  },
+  "radix": {
+    "python": "radix_sort",
+    "native": "radixSort"
+  },
+  "linear": {
+    "python": "linear_search",
+    "native": "linearSearch"
+  },
+  "binary": {
+    "python": "binary_search",
+    "native": "binarySearch"
+  },
+  "traverse": {
+    "python": "traverse_array",
+    "native": "traverseArray"
+  },
+  "sliding": {
+    "python": "max_window_sum",
+    "native": "maxWindowSum"
+  },
+  "two_pointer": {
+    "python": "find_pair_sum",
+    "native": "findPairSum"
+  },
+  "reverse_string": {
+    "python": "reverse_string",
+    "native": "reverseCodepoints"
+  },
+  "stack": {
+    "python": "stack_demo",
+    "native": "stackDemo"
+  },
+  "queue": {
+    "python": "queue_demo",
+    "native": "queueDemo"
+  },
+  "deque": {
+    "python": "deque_demo",
+    "native": "dequeDemo"
+  },
+  "heap": {
+    "python": "build_min_heap",
+    "native": "buildMinHeap"
+  },
+  "priority": {
+    "python": "priority_queue_demo",
+    "native": "priorityQueueDemo"
+  },
+  "singly": {
+    "python": "singly_linked_list",
+    "native": "buildSinglyLinkedList"
+  },
+  "doubly": {
+    "python": "doubly_linked_list",
+    "native": "buildDoublyLinkedList"
+  },
+  "circular": {
+    "python": "circular_linked_list",
+    "native": "buildCircularList"
+  },
+  "bst": {
+    "python": "build_and_search_bst",
+    "native": "buildAndSearchBST"
+  },
+  "bfs_tree": {
+    "python": "tree_breadth_first",
+    "native": "treeBreadthFirst"
+  },
+  "dfs_tree": {
+    "python": "tree_depth_first",
+    "native": "treeDepthFirst"
+  },
+  "avl": {
+    "python": "build_avl_tree",
+    "native": "buildAVLTree"
+  },
+  "redblack": {
+    "python": "build_red_black_tree",
+    "native": "buildRedBlackTree"
+  },
+  "bfs_graph": {
+    "python": "graph_breadth_first",
+    "native": "graphBreadthFirst"
+  },
+  "dfs_graph": {
+    "python": "graph_depth_first",
+    "native": "graphDepthFirst"
+  },
+  "dijkstra": {
+    "python": "shortest_distances",
+    "native": "shortestDistances"
+  },
+  "topological": {
+    "python": "topological_sort",
+    "native": "topologicalSort"
+  },
+  "fibonacci": {
+    "python": "fibonacci_table",
+    "native": "fibonacciTable"
+  },
+  "memoization": {
+    "python": "fibonacci_memo",
+    "native": "fibonacciMemo"
+  },
+  "knapsack": {
+    "python": "knapsack",
+    "native": "knapsack"
+  },
+  "hash_chaining": {
+    "python": "hash_map_chaining",
+    "native": "hashMapChaining"
+  },
+  "hashset": {
+    "python": "hash_set",
+    "native": "hashSet"
+  },
+  "hash_probing": {
+    "python": "hash_map_probing",
+    "native": "hashMapProbing"
+  }
+}

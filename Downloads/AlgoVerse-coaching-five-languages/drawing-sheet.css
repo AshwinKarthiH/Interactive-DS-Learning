@@ -1,0 +1,15 @@
+.notes-sheet{position:fixed;z-index:300;left:20%;top:130px;width:640px;height:410px;display:flex;flex-direction:column;box-sizing:border-box;background:rgba(255,255,255,.42);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);border:1px solid rgba(255,255,255,.65);border-radius:14px;box-shadow:0 12px 40px #0003;color:#101827;overflow:hidden}
+.notes-sheet[hidden]{display:none}
+.notes-toolbar{background:rgba(255,255,255,.88);display:flex;align-items:center;gap:7px;padding:9px;flex-wrap:wrap;border-bottom:1px solid #10182733;flex:none}
+.notes-toolbar button{color:#101827;background:#ffffffb3;border:1px solid #10182740;border-radius:7px;padding:7px;cursor:pointer;font:inherit;font-size:13px}
+.notes-toolbar button[aria-pressed=true]{background:#d9c7fa;border-color:#6338a7}
+.notes-toolbar button:disabled{opacity:.4;cursor:default}
+.notes-toolbar :focus-visible,.notes-resize:focus-visible{outline:3px solid #6534ac;outline-offset:2px}
+.notes-drag{font-weight:700;cursor:move;touch-action:none;padding:5px;flex:1;min-width:95px;user-select:none}
+.notes-toolbar label{display:flex;align-items:center;gap:4px;font-size:12px}
+.notes-toolbar input[type=color]{width:30px;height:30px;padding:1px;border:1px solid #10182755;background:transparent}
+.notes-toolbar input[type=range]{width:65px;accent-color:#6338a7}
+.notes-canvas{display:block;width:100%;flex:1;min-height:0;background:transparent;touch-action:none;cursor:crosshair}
+.notes-resize{position:absolute;bottom:0;right:0;width:25px;height:25px;border:0;background:#ffffffb3;color:#101827;cursor:nwse-resize;touch-action:none;border-radius:8px 0 0 0}
+.notes-toggle{border:1px solid #8b6abc;background:#20182f;color:#eee;border-radius:8px;padding:8px 10px;cursor:pointer;white-space:nowrap}
+@media(max-width:600px){.notes-sheet{left:8px;top:95px;width:calc(100vw - 16px);height:400px}.notes-toolbar{gap:5px;padding:7px}.notes-toolbar button{padding:6px}.notes-toggle{padding:7px;font-size:12px}.topbar-search{width:0}.topbar-actions{gap:4px}.filter-controls{flex-wrap:wrap;min-width:0}.practice-header{flex-wrap:wrap}}
