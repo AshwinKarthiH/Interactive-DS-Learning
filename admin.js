@@ -3,8 +3,9 @@
    ============================================ */
 (function () {
     'use strict';
+    if(globalThis.AlgoAPI?.enabled)return;
 
-    const userData = JSON.parse(localStorage.getItem('algoverse_user') || '{}');
+    const userData = AlgoStore.read('algoverse_user', {});
     const adminName = document.getElementById('adminName');
     if (adminName) adminName.textContent = userData.name || 'Admin';
 
@@ -37,61 +38,49 @@
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) logoutBtn.addEventListener('click', () => { localStorage.removeItem('algoverse_user'); window.location.href = 'index.html'; });
 
-    // User search
-    const userSearch = document.getElementById('userSearch');
-    if (userSearch) {
-        userSearch.addEventListener('input', () => {
-            const q = userSearch.value.toLowerCase();
-            document.querySelectorAll('#usersTable tbody tr').forEach(row => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(q) ? '' : 'none';
-            });
+
+    // Administrative data is sample data, saved in this browser only.
+    const removed = AlgoStore.read('algoverse_admin_removed', []);
+    const settings = AlgoStore.read('algoverse_admin_settings', {});
+    document.querySelectorAll('#usersTable tbody tr, .content-card, #pageQuizzes tbody tr').forEach((item,i) => {
+        item.dataset.localId = String(i);
+        if (removed.includes(String(i))) item.remove();
+    });
+    function filterUsers() {
+        const query = document.getElementById('userSearch').value.toLowerCase();
+        const role = document.getElementById('roleFilter').value;
+        const status = document.getElementById('statusFilter').value;
+        document.querySelectorAll('#usersTable tbody tr').forEach(row => {
+            row.hidden = !(row.textContent.toLowerCase().includes(query) &&
+                (role === 'all' || row.querySelector('.role-badge')?.classList.contains(role)) &&
+                (status === 'all' || row.querySelector('.status-dot')?.classList.contains(status)));
         });
     }
-
-    // Role filter
-    const roleFilter = document.getElementById('roleFilter');
-    if (roleFilter) {
-        roleFilter.addEventListener('change', () => {
-            const val = roleFilter.value;
-            document.querySelectorAll('#usersTable tbody tr').forEach(row => {
-                const role = row.querySelector('.role-badge');
-                if (!role) return;
-                const isMatch = val === 'all' || role.classList.contains(val);
-                row.style.display = isMatch ? '' : 'none';
-            });
+    ['userSearch','roleFilter','statusFilter'].forEach(id=>document.getElementById(id)?.addEventListener(id==='userSearch'?'input':'change',filterUsers));
+    document.querySelectorAll('.act-btn.del').forEach(btn=>btn.addEventListener('click',()=>{
+        if (!confirm('Delete this sample item from this browser?')) return;
+        const item=btn.closest('tr') || btn.closest('.content-card');
+        if (!item) return;
+        const next=[...removed,item.dataset.localId];
+        if (AlgoStore.write('algoverse_admin_removed',next)) {removed.push(item.dataset.localId);item.remove();}
+    }));
+    document.querySelectorAll('.settings-card').forEach((card,i)=>{
+        const fields=[...card.querySelectorAll('input,textarea')];
+        fields.forEach((field,j)=>{
+            const saved=settings[i]?.[j];
+            if(saved!==undefined) {if(field.type==='checkbox')field.checked=saved===true;else field.value=saved;}
         });
-    }
-
-    // Delete buttons
-    document.querySelectorAll('.act-btn.del').forEach(btn => {
-        btn.addEventListener('click', () => {
-            if (confirm('Are you sure you want to delete this item?')) {
-                const row = btn.closest('tr') || btn.closest('.content-card');
-                if (row) { row.style.opacity = '0'; row.style.transform = 'scale(0.95)'; row.style.transition = 'all 0.3s ease'; setTimeout(() => row.remove(), 300); }
-            }
-        });
-    });
-
-    // Save buttons
-    document.querySelectorAll('.btn-save').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const origText = btn.textContent;
-            btn.textContent = '✓ Saved!';
-            btn.style.background = 'rgba(34,197,94,0.2)';
-            btn.style.color = '#22c55e';
-            setTimeout(() => { btn.textContent = origText; btn.style.background = ''; btn.style.color = ''; }, 2000);
+        const btn=card.querySelector('.btn-save');
+        if (!btn) return;
+        if(i===2 || !fields.length) {btn.disabled=true;btn.textContent='Requires backend — unavailable';fields.forEach(f=>f.disabled=true);return;}
+        btn.textContent='Save browser-local settings';
+        btn.addEventListener('click',()=>{
+            settings[i]=fields.map(f=>f.type==='checkbox'?f.checked:f.value);
+            if(AlgoStore.write('algoverse_admin_settings',settings)) {btn.textContent='Saved in this browser';setTimeout(()=>btn.textContent='Save browser-local settings',1500);}
         });
     });
-
-    // Add buttons (demo modals)
-    ['addUserBtn', 'addContentBtn', 'addQuizBtn'].forEach(id => {
-        const btn = document.getElementById(id);
-        if (btn) {
-            btn.addEventListener('click', () => {
-                alert('This would open a creation form in a full implementation. Demo mode active.');
-            });
-        }
+    document.querySelectorAll('.act-btn:not(.del), .btn-add').forEach(btn=>{
+        btn.disabled=true; btn.title='Not implemented in this local demo';
+        if(btn.classList.contains('btn-add'))btn.textContent+=' — unavailable';
     });
-
 })();

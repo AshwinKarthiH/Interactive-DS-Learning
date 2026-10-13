@@ -395,6 +395,7 @@
 
     // --- Initialize ---
     function init() {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
         resizeCanvas();
         initParticles();
         animate();

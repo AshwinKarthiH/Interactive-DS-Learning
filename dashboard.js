@@ -2,49 +2,29 @@
    ALGOVERSE — Dashboard JavaScript
    Visualizer, Practice, Battle, Navigation
    ============================================ */
-(function () {
+(async function () {
     'use strict';
+    if(globalThis.AlgoAPI?.enabled){try{await AlgoAPI.ready;}catch{return;}if(!AlgoAPI.user)return;}
 
     // === User Data ===
-    const userData = JSON.parse(localStorage.getItem('algoverse_user') || '{"name": "Nikitha", "role": "student"}');
+    const userData = AlgoStore.read('algoverse_user', {name:'Guest', role:'student'});
     const welcomeName = document.getElementById('welcomeName');
     const userName = document.getElementById('userName');
     const userAvatar = document.getElementById('userAvatar');
-    const displayName = userData.name || 'Nikitha';
+    const displayName = userData.name || 'Guest';
     if (welcomeName) welcomeName.textContent = displayName;
     if (userName) userName.textContent = displayName;
     if (userAvatar) userAvatar.textContent = displayName.charAt(0).toUpperCase();
 
-    // === Light / Dark Mode Toggle ===
-    const themeBtn = document.getElementById('themeBtn');
-    const savedTheme = localStorage.getItem('algoverse_theme') || 'dark';
-    if (savedTheme === 'light') {
-        document.body.classList.add('light-mode');
-        updateThemeIcon(true);
-    }
-
-    function updateThemeIcon(isLight) {
-        if (!themeBtn) return;
-        themeBtn.innerHTML = isLight
-            ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`
-            : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
-    }
-
-    if (themeBtn) {
-        themeBtn.addEventListener('click', () => {
-            const isLight = document.body.classList.toggle('light-mode');
-            localStorage.setItem('algoverse_theme', isLight ? 'light' : 'dark');
-            updateThemeIcon(isLight);
-        });
-    }
-
+    // This app uses the dark theme only. Ignore and remove older saved theme preferences.
+    try {localStorage.removeItem('algoverse_theme');} catch {}
     // === Sidebar Toggle ===
     const sidebar = document.getElementById('sidebar');
     const sidebarToggle = document.getElementById('sidebarToggle');
     const topbarMenu = document.getElementById('topbarMenu');
 
-    if (sidebarToggle) sidebarToggle.addEventListener('click', () => sidebar.classList.toggle('collapsed'));
-    if (topbarMenu) topbarMenu.addEventListener('click', () => sidebar.classList.toggle('open'));
+    if (sidebarToggle) sidebarToggle.addEventListener('click', () => {sidebar.classList.toggle('collapsed');sidebarToggle.setAttribute('aria-expanded',!sidebar.classList.contains('collapsed'));sidebarToggle.setAttribute('aria-label',sidebar.classList.contains('collapsed')?'Expand sidebar':'Collapse sidebar');});
+    if (topbarMenu) topbarMenu.addEventListener('click', () => {sidebar.classList.remove('collapsed');sidebar.classList.toggle('open');sidebarToggle.setAttribute('aria-expanded','true');sidebarToggle.setAttribute('aria-label','Collapse sidebar');});
 
     // === Page Navigation ===
     const pages = document.querySelectorAll('.page');
@@ -56,16 +36,15 @@
         const page = document.getElementById('page' + pageId.charAt(0).toUpperCase() + pageId.slice(1));
         if (page) page.classList.add('active');
         sidebarLinks.forEach(l => { if (l.dataset.page === pageId) l.classList.add('active'); });
-        if (window.innerWidth < 768) sidebar.classList.remove('open');
+        if (window.innerWidth <= 768) sidebar.classList.remove('open');
     }
 
     sidebarLinks.forEach(link => {
+        link.setAttribute('aria-label',link.textContent.trim());link.title=link.textContent.trim();
         link.addEventListener('click', (e) => {
             e.preventDefault();
             showPage(link.dataset.page);
-            if (link.dataset.topic) {
-                setTimeout(() => selectCategory(link.dataset.topic), 100);
-            }
+            if (link.dataset.topic && !link.classList.contains('subtopic-link')) selectCategory(link.dataset.topic);
         });
     });
 
@@ -73,11 +52,13 @@
     document.querySelectorAll('.topic-header').forEach(header => {
         header.addEventListener('click', () => {
             const group = header.closest('.topic-group');
+            if (sidebar.classList.contains('collapsed')) {sidebar.classList.remove('collapsed');sidebarToggle.setAttribute('aria-expanded','true');sidebarToggle.setAttribute('aria-label','Collapse sidebar');group.classList.add('open');header.setAttribute('aria-expanded','true');return;}
             const topic = header.dataset.topic;
             document.querySelectorAll('.topic-group').forEach(g => {
-                if (g !== group) g.classList.remove('open');
+                if (g !== group) {g.classList.remove('open');g.querySelector('.topic-header')?.setAttribute('aria-expanded','false');}
             });
             group.classList.toggle('open');
+            header.setAttribute('aria-expanded',group.classList.contains('open'));
             showPage('visualizer');
             selectCategory(topic);
         });
@@ -103,23 +84,7 @@
     const searchDropdown = document.getElementById('searchDropdown');
 
     const SEARCH_ITEMS = [
-        { name: 'Bubble Sort', category: 'sorting', algoId: 'bubble', type: 'algo' },
-        { name: 'Selection Sort', category: 'sorting', algoId: 'selection', type: 'algo' },
-        { name: 'Insertion Sort', category: 'sorting', algoId: 'insertion', type: 'algo' },
-        { name: 'Merge Sort', category: 'sorting', algoId: 'merge', type: 'algo' },
-        { name: 'Linear Search', category: 'searching', algoId: 'linear', type: 'algo' },
-        { name: 'Binary Search', category: 'searching', algoId: 'binary', type: 'algo' },
-        { name: 'Stack (LIFO)', category: 'stack', algoId: 'stack', type: 'algo' },
-        { name: 'Queue (FIFO)', category: 'stack', algoId: 'queue', type: 'algo' },
-        { name: 'Binary Search Tree', category: 'tree', algoId: 'bst', type: 'algo' },
-        { name: 'BFS Traversal', category: 'tree', algoId: 'bfs_tree', type: 'algo' },
-        { name: 'Singly Linked List', category: 'linkedlist', algoId: 'singly', type: 'algo' },
-        { name: 'Doubly Linked List', category: 'linkedlist', algoId: 'doubly', type: 'algo' },
-        { name: 'Sorting Topic', category: 'sorting', type: 'topic' },
-        { name: 'Searching Topic', category: 'searching', type: 'topic' },
-        { name: 'Trees Topic', category: 'tree', type: 'topic' },
-        { name: 'Stacks & Queues Topic', category: 'stack', type: 'topic' },
-        { name: 'Linked Lists Topic', category: 'linkedlist', type: 'topic' },
+        ...Object.entries(AlgoLessons).flatMap(([category,g])=>g.algos.map(a=>({name:a.name,category,algoId:a.id,type:'algo'}))),
         { name: '1. Two Sum', problemId: 'two-sum', type: 'problem' },
         { name: '206. Reverse a Linked List', problemId: 'reverse-linked-list', type: 'problem' },
         { name: '20. Valid Parentheses', problemId: 'valid-parentheses', type: 'problem' },
@@ -145,10 +110,10 @@
             }
 
             searchDropdown.innerHTML = matches.map(item => `
-                <div class="search-result-item" data-type="${item.type}" data-cat="${item.category || ''}" data-algo="${item.algoId || ''}" data-problem="${item.problemId || ''}">
+                <button type="button" class="search-result-item" data-type="${item.type}" data-cat="${item.category || ''}" data-algo="${item.algoId || ''}" data-problem="${item.problemId || ''}">
                     <span>${item.name}</span>
                     <span class="search-result-badge ${item.type}">${item.type}</span>
-                </div>
+                </button>
             `).join('');
             searchDropdown.style.display = 'block';
 
@@ -190,6 +155,7 @@
     // === Logout ===
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) logoutBtn.addEventListener('click', () => {
+        if(globalThis.AlgoAPI?.enabled){AlgoAPI.logout().catch(e=>AlgoAPI.status(e.message,true));return;}
         localStorage.removeItem('algoverse_user');
         window.location.href = 'index.html';
     });
@@ -197,47 +163,12 @@
     // ============================================
     // DSA VISUALIZER
     // ============================================
-    const ALGORITHMS = {
-        sorting: {
-            label: 'Sorting',
-            algos: [
-                { id: 'bubble', name: 'Bubble Sort', best: 'O(n)', avg: 'O(n²)', worst: 'O(n²)', space: 'O(1)', desc: 'Bubble Sort repeatedly steps through the list, compares adjacent elements, and swaps them if they are in the wrong order. The pass through the list is repeated until sorted.' },
-                { id: 'selection', name: 'Selection Sort', best: 'O(n²)', avg: 'O(n²)', worst: 'O(n²)', space: 'O(1)', desc: 'Selection Sort divides the array into sorted and unsorted regions. It repeatedly selects the smallest element from the unsorted region and moves it to the sorted region.' },
-                { id: 'insertion', name: 'Insertion Sort', best: 'O(n)', avg: 'O(n²)', worst: 'O(n²)', space: 'O(1)', desc: 'Insertion Sort builds the sorted array one item at a time by repeatedly inserting the next element into its correct position within the already sorted portion.' },
-                { id: 'merge', name: 'Merge Sort', best: 'O(n log n)', avg: 'O(n log n)', worst: 'O(n log n)', space: 'O(n)', desc: 'Merge Sort divides the array in half, recursively sorts each half, then merges the sorted halves. It uses a divide-and-conquer approach for guaranteed O(n log n) performance.' },
-            ]
-        },
-        searching: {
-            label: 'Searching',
-            algos: [
-                { id: 'linear', name: 'Linear Search', best: 'O(1)', avg: 'O(n)', worst: 'O(n)', space: 'O(1)', desc: 'Linear Search checks each element sequentially until the target is found or the end of the array is reached. Simple but works on unsorted data.' },
-                { id: 'binary', name: 'Binary Search', best: 'O(1)', avg: 'O(log n)', worst: 'O(log n)', space: 'O(1)', desc: 'Binary Search repeatedly divides a sorted array in half, comparing the target with the middle element. Extremely efficient for sorted data.' },
-            ]
-        },
-        stack: {
-            label: 'Stack & Queue',
-            algos: [
-                { id: 'stack', name: 'Stack (LIFO)', best: 'O(1)', avg: 'O(1)', worst: 'O(1)', space: 'O(n)', desc: 'A Stack follows Last-In-First-Out (LIFO). Push adds to the top, Pop removes from the top. Used in function calls, undo operations, and expression evaluation.' },
-                { id: 'queue', name: 'Queue (FIFO)', best: 'O(1)', avg: 'O(1)', worst: 'O(1)', space: 'O(n)', desc: 'A Queue follows First-In-First-Out (FIFO). Enqueue adds to the back, Dequeue removes from the front. Used in BFS, scheduling, and buffering.' },
-            ]
-        },
-        linkedlist: {
-            label: 'Linked List',
-            algos: [
-                { id: 'singly', name: 'Singly Linked List', best: 'O(1)', avg: 'O(n)', worst: 'O(n)', space: 'O(n)', desc: 'A Singly Linked List has nodes pointing to the next node. Insertion at head is O(1), searching requires traversal. Great for dynamic size data.' },
-                { id: 'doubly', name: 'Doubly Linked List', best: 'O(1)', avg: 'O(n)', worst: 'O(n)', space: 'O(n)', desc: 'A Doubly Linked List has nodes pointing to both next and previous nodes, allowing bidirectional traversal at the cost of extra memory per node.' },
-            ]
-        },
-        tree: {
-            label: 'Trees',
-            algos: [
-                { id: 'bst', name: 'Binary Search Tree', best: 'O(log n)', avg: 'O(log n)', worst: 'O(n)', space: 'O(n)', desc: 'A BST maintains the property that left children are smaller and right children are larger. Supports efficient search, insert, and delete operations.' },
-                { id: 'bfs_tree', name: 'BFS Traversal', best: 'O(n)', avg: 'O(n)', worst: 'O(n)', space: 'O(n)', desc: 'Breadth-First Search visits all nodes level by level using a queue. It guarantees finding the shortest path in unweighted graphs.' },
-            ]
-        }
-    };
+    const ALGORITHMS = AlgoLessons;
 
+    let collapseOnSelection = false;
     let currentArray = [];
+    let seedValues = [];
+    let currentStep = null;
     let sorting = false;
     let paused = false;
     let animSpeed = 25;
@@ -263,93 +194,93 @@
     });
 
     function selectCategory(cat, targetAlgoId = null) {
+        if (!ALGORITHMS[cat]) return;
         catButtons.forEach(b => b.classList.toggle('active', b.dataset.category === cat));
         renderAlgoList(cat, targetAlgoId);
     }
-
     function renderAlgoList(cat, targetAlgoId = null) {
-        if (!algoList || !ALGORITHMS[cat]) return;
-        algoList.innerHTML = '';
-        let targetIndex = 0;
-        if (targetAlgoId) {
-            const foundIdx = ALGORITHMS[cat].algos.findIndex(a => a.id === targetAlgoId);
-            if (foundIdx !== -1) targetIndex = foundIdx;
-        }
-
-        ALGORITHMS[cat].algos.forEach((algo, i) => {
-            const btn = document.createElement('button');
-            btn.className = 'algo-btn' + (i === targetIndex ? ' active' : '');
-            btn.textContent = algo.name;
-            btn.addEventListener('click', () => {
-                algoList.querySelectorAll('.algo-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                selectAlgorithm(algo);
-            });
-            algoList.appendChild(btn);
+        algoList.replaceChildren();
+        const group=ALGORITHMS[cat];
+        const available=group.algos.filter(a=>!AlgoAPI.enabled||AlgoAPI.activeLessons.has(a.id));
+        if(!available.length){algoList.textContent='No published lessons in this category.';return;}
+        const selected=available.find(a=>a.id===targetAlgoId)||available[0];
+        available.forEach(algo=>{
+            const btn=document.createElement('button'); btn.className='algo-btn'+(algo===selected?' active':'');
+            btn.textContent=algo.name;btn.dataset.algo=algo.id;
+            btn.addEventListener('click',()=>{algoList.querySelectorAll('.algo-btn').forEach(b=>b.classList.toggle('active',b===btn));selectAlgorithm(algo);});
+            algoList.append(btn);
         });
-        selectAlgorithm(ALGORITHMS[cat].algos[targetIndex]);
+        selectAlgorithm(selected);
     }
-
     function selectAlgorithm(algo) {
-        currentAlgo = algo;
-        if (vizTitle) vizTitle.textContent = algo.name;
-        if (vizComplexity) vizComplexity.textContent = algo.worst;
-        if (vizEmpty) vizEmpty.classList.add('hidden');
-        const exp = document.getElementById('algoExplanation');
-        if (exp) exp.textContent = algo.desc;
-        const bestEl = document.getElementById('bestCase');
-        const avgEl = document.getElementById('avgCase');
-        const worstEl = document.getElementById('worstCase');
-        const spaceEl = document.getElementById('spaceComp');
-        if (bestEl) bestEl.textContent = algo.best;
-        if (avgEl) avgEl.textContent = algo.avg;
-        if (worstEl) worstEl.textContent = algo.worst;
-        if (spaceEl) spaceEl.textContent = algo.space;
-        resetViz();
-        generateArray();
+        if(AlgoAPI.enabled&&!AlgoAPI.activeLessons.has(algo.id)){AlgoAPI.status('This lesson is not currently published.');return;}
+        currentAlgo=algo;
+        if(collapseOnSelection) {if(innerWidth>768){sidebar.classList.add('collapsed');sidebarToggle.setAttribute('aria-expanded','false');sidebarToggle.setAttribute('aria-label','Expand sidebar');}else sidebar.classList.remove('open','collapsed');document.getElementById('lessonPicker').open=false;}
+        document.querySelectorAll('.subtopic-link').forEach(link=>link.classList.toggle('active',link.dataset.algo===algo.id));
+        vizTitle.textContent=algo.name;vizComplexity.textContent=algo.worst;
+        vizEmpty.classList.add('hidden');
+        document.getElementById('traceVars').hidden=!['bars','cells','string'].includes(algo.view);
+        document.getElementById('algoExplanation').textContent=algo.desc;
+        document.getElementById('lessonAnalogy').textContent=algo.analogy;
+        document.getElementById('lessonUse').textContent='Where you use it: '+algo.use;
+        document.getElementById('lessonNote').textContent=algo.note;
+        const costs={'O(1)':'constant work for one operation','O(n)':'work grows with the number of values','O(log n)':'work grows slowly as the collection grows','O(n²)':'work can grow like the number of values squared','O(n log n)':'more work than a single scan, much less than comparing every pair','O(V + E)':'visit graph nodes and their connections','O(V² + E)':'scan nodes to select each next node, then check connections','O(nC)':'fill a table for each item and bag capacity','O(d(n + 10))':'make one bucket pass per digit'};
+        document.getElementById('lessonCost').textContent='Worst-case time in everyday terms: '+(costs[algo.worst]||algo.worst)+'. n = values, V = graph nodes, E = edges, C = bag capacity, d = digits. Costs exclude drawing the animation.';
+        const guide=document.getElementById('lessonGuide');guide.replaceChildren();
+        algo.guide.forEach(text=>{const li=document.createElement('li');li.textContent=text;guide.append(li);});
+        for(const [id,key] of [['bestCase','best'],['avgCase','avg'],['worstCase','worst'],['spaceComp','space']])document.getElementById(id).textContent=algo[key];
+        const isGraph=algo.view==='graph',isText=algo.view==='string';
+        document.getElementById('valueControls').hidden=isGraph||isText||['fibonacci','memoization'].includes(algo.id);
+        document.getElementById('graphControls').hidden=!isGraph;
+        document.getElementById('textControls').hidden=!isText;
+        const paramLabels={linear:'Target to find',binary:'Target to find',sliding:'Window size k',two_pointer:'Pair sum target',bst:'Value to find',bfs_graph:'Start node',dfs_graph:'Start node',dijkstra:'Start node',fibonacci:'n (0–20)',memoization:'n (0–20)',knapsack:'Bag capacity (0–20)',hash_chaining:'Key to find',hash_probing:'Key to find',hashset:'Value to find'};
+        document.getElementById('parameterControls').hidden=!paramLabels[algo.id];
+        document.getElementById('parameterLabel').textContent=paramLabels[algo.id]||'Parameter';
+        document.getElementById('searchTarget').value=isGraph?0:algo.id==='sliding'?3:['fibonacci','memoization'].includes(algo.id)?8:algo.id==='knapsack'?5:40;
+        const graph=AlgoDSA.defaultGraph(algo.id==='topological');
+        document.getElementById('graphInput').value=graph.edges.map(e=>`${e.from}-${e.to}:${e.weight}`).join(', ');
+        document.getElementById('stringInput').value='ALGORITHM';
+        document.getElementById('valuesInput').value=algo.id==='knapsack'?'6, 10, 12':algo.view==='tree'?'30, 20, 10, 25, 40, 50':'18, 7, 25, 3, 12, 7';
+        sizeSlider.disabled=isGraph||isText||['fibonacci','memoization'].includes(algo.id);
+        resetViz();applyInputs();
     }
-
-    // Generate array
+    function optionsFromInputs() {
+        const options={target:Number(document.getElementById('searchTarget').value),text:document.getElementById('stringInput').value};
+        if(!Number.isSafeInteger(options.target))throw new Error('Use a whole number for the target or parameter.');
+        if(currentAlgo.view==='graph')options.graph=AlgoDSA.parseGraph(document.getElementById('graphInput').value);
+        return options;
+    }
+    function applyInputs() {
+        try {
+            const text=document.getElementById('valuesInput').value.trim();
+            const values=text?text.split(',').map(v=>{if(!v.trim())throw new Error('Enter values separated by commas, with no empty entries.');return Number(v.trim());}):[];
+            if(values.length>25||values.some(v=>!Number.isSafeInteger(v)||Math.abs(v)>1000))throw new Error('Use up to 25 whole numbers between −1000 and 1000.');
+            if(Array.from(document.getElementById('stringInput').value).length>25)throw new Error('Use at most 25 characters.');
+            const prepared=AlgoDSA.generate(currentAlgo.id,values,optionsFromInputs());
+            resetViz();seedValues=[...values];currentArray=[...values];steps=prepared;updateInfo();renderPreview();renderLessonCode();updateInspector(null);
+            document.getElementById('lessonError').textContent='';return true;
+        } catch(error) {resetViz();document.getElementById('lessonError').textContent=error.message;setStatus('Check input');return false;}
+    }
     function generateArray() {
-        const size = sizeSlider ? parseInt(sizeSlider.value) : 10;
-        currentArray = [];
-        for (let i = 0; i < size; i++) {
-            currentArray.push(Math.floor(Math.random() * 250) + 10);
-        }
-        renderBars();
-        resetCounters();
+        if(currentAlgo.view==='graph') {
+            const graph=AlgoDSA.defaultGraph(currentAlgo.id==='topological');
+            document.getElementById('graphInput').value=graph.edges.map(e=>`${e.from}-${e.to}:${e.weight}`).join(', ');
+        } else if(currentAlgo.view==='string')document.getElementById('stringInput').value='ALGORITHM';
+        else document.getElementById('valuesInput').value=Array.from({length:Number(sizeSlider.value)},()=>Math.floor(Math.random()*99)+1).join(', ');
+        applyInputs();
     }
-
-    function renderBars(highlights = {}) {
-        if (!vizBars) return;
-        vizBars.innerHTML = '';
-        const maxVal = Math.max(...currentArray);
-        currentArray.forEach((val, i) => {
-            const bar = document.createElement('div');
-            bar.className = 'viz-bar';
-            const heightPct = (val / maxVal) * 100;
-            bar.style.height = heightPct + '%';
-
-            if (highlights.sorted && highlights.sorted.includes(i)) {
-                bar.classList.add('sorted');
-            } else if (highlights.comparing && highlights.comparing.includes(i)) {
-                bar.classList.add('comparing');
-            } else if (highlights.swapping && highlights.swapping.includes(i)) {
-                bar.classList.add('swapping');
-            } else if (highlights.pivot === i) {
-                bar.classList.add('pivot');
-            } else {
-                bar.classList.add('default');
-            }
-
-            if (currentArray.length <= 30) {
-                const label = document.createElement('span');
-                label.className = 'viz-bar-label';
-                label.textContent = val;
-                bar.appendChild(label);
-            }
-            vizBars.appendChild(bar);
-        });
+    function renderPreview() {
+        let state={};const view=currentAlgo.view;
+        if(view==='graph'){const graph=optionsFromInputs().graph;state={...graph,directed:currentAlgo.id==='topological',visited:[]};}
+        if(view==='string')state={chars:Array.from(document.getElementById('stringInput').value)};
+        if(view==='table')state={table:Array(Number(document.getElementById('searchTarget').value)+1).fill(null)};
+        if(view==='buckets')state={buckets:Array.from({length:currentAlgo.id==='hash_probing'?Math.max(7,seedValues.length*2+1):7},()=>[])};
+        const initialArray=['stack','queue','list','heap','tree'].includes(view)?[]:seedValues;
+        AlgoView.draw(vizBars,currentAlgo,{array:initialArray,state,active:[]});
+        document.getElementById('stepNarration').textContent='Press Step to learn one move at a time, or Play to watch the full example.';
+    }
+    function renderBars() {
+        if(currentStep)AlgoView.draw(vizBars,currentAlgo,currentStep);
     }
 
     function resetCounters() {
@@ -363,136 +294,20 @@
         el('infoSwaps', swaps);
         el('stepCurrent', stepIndex);
         el('stepTotal', steps.length);
+        const timeline=document.getElementById('vizTimeline');timeline.max=steps.length;timeline.value=stepIndex;timeline.disabled=!steps.length;
+        document.getElementById('vizPrevious').disabled=stepIndex===0;
     }
 
     function setStatus(s) {
         const el = document.getElementById('infoStatus');
         if (el) el.textContent = s;
+        if(AlgoAPI.enabled&&s.startsWith('Completed')&&currentAlgo)AlgoAPI.queue('lesson:'+currentAlgo.id,'/progress/lessons/'+currentAlgo.id,{completed:true});
     }
 
     // === Sorting Algorithms (generate steps) ===
     function generateSortSteps() {
-        steps = [];
-        const arr = [...currentArray];
         if (!currentAlgo) return;
-        switch (currentAlgo.id) {
-            case 'bubble': bubbleSortSteps(arr); break;
-            case 'selection': selectionSortSteps(arr); break;
-            case 'insertion': insertionSortSteps(arr); break;
-            case 'merge': mergeSortSteps(arr); break;
-            case 'linear': linearSearchSteps(arr); break;
-            case 'binary': binarySearchSteps(arr); break;
-            default: bubbleSortSteps(arr); break;
-        }
-    }
-
-    function bubbleSortSteps(arr) {
-        const a = [...arr];
-        const n = a.length;
-        const sorted = [];
-        for (let i = 0; i < n; i++) {
-            for (let j = 0; j < n - i - 1; j++) {
-                steps.push({ type: 'compare', indices: [j, j + 1], array: [...a], sorted: [...sorted] });
-                if (a[j] > a[j + 1]) {
-                    [a[j], a[j + 1]] = [a[j + 1], a[j]];
-                    steps.push({ type: 'swap', indices: [j, j + 1], array: [...a], sorted: [...sorted] });
-                }
-            }
-            sorted.unshift(n - i - 1);
-        }
-        steps.push({ type: 'done', array: [...a], sorted: Array.from({ length: n }, (_, i) => i) });
-    }
-
-    function selectionSortSteps(arr) {
-        const a = [...arr];
-        const n = a.length;
-        const sorted = [];
-        for (let i = 0; i < n; i++) {
-            let minIdx = i;
-            for (let j = i + 1; j < n; j++) {
-                steps.push({ type: 'compare', indices: [minIdx, j], array: [...a], sorted: [...sorted] });
-                if (a[j] < a[minIdx]) minIdx = j;
-            }
-            if (minIdx !== i) {
-                [a[i], a[minIdx]] = [a[minIdx], a[i]];
-                steps.push({ type: 'swap', indices: [i, minIdx], array: [...a], sorted: [...sorted] });
-            }
-            sorted.push(i);
-        }
-        steps.push({ type: 'done', array: [...a], sorted: Array.from({ length: n }, (_, i) => i) });
-    }
-
-    function insertionSortSteps(arr) {
-        const a = [...arr];
-        const n = a.length;
-        const sorted = [0];
-        for (let i = 1; i < n; i++) {
-            let j = i;
-            while (j > 0) {
-                steps.push({ type: 'compare', indices: [j - 1, j], array: [...a], sorted: [...sorted] });
-                if (a[j - 1] > a[j]) {
-                    [a[j - 1], a[j]] = [a[j], a[j - 1]];
-                    steps.push({ type: 'swap', indices: [j - 1, j], array: [...a], sorted: [...sorted] });
-                    j--;
-                } else break;
-            }
-            sorted.push(i);
-        }
-        steps.push({ type: 'done', array: [...a], sorted: Array.from({ length: n }, (_, i) => i) });
-    }
-
-    function mergeSortSteps(arr) {
-        const a = [...arr];
-        function merge(a, l, m, r) {
-            const left = a.slice(l, m + 1);
-            const right = a.slice(m + 1, r + 1);
-            let i = 0, j = 0, k = l;
-            while (i < left.length && j < right.length) {
-                steps.push({ type: 'compare', indices: [l + i, m + 1 + j], array: [...a], sorted: [] });
-                if (left[i] <= right[j]) { a[k++] = left[i++]; }
-                else { a[k++] = right[j++]; }
-                steps.push({ type: 'swap', indices: [k - 1], array: [...a], sorted: [] });
-            }
-            while (i < left.length) { a[k++] = left[i++]; steps.push({ type: 'swap', indices: [k - 1], array: [...a], sorted: [] }); }
-            while (j < right.length) { a[k++] = right[j++]; steps.push({ type: 'swap', indices: [k - 1], array: [...a], sorted: [] }); }
-        }
-        function msort(a, l, r) {
-            if (l < r) {
-                const m = Math.floor((l + r) / 2);
-                msort(a, l, m);
-                msort(a, m + 1, r);
-                merge(a, l, m, r);
-            }
-        }
-        msort(a, 0, a.length - 1);
-        steps.push({ type: 'done', array: [...a], sorted: Array.from({ length: a.length }, (_, i) => i) });
-    }
-
-    function linearSearchSteps(arr) {
-        const target = arr[Math.floor(Math.random() * arr.length)];
-        for (let i = 0; i < arr.length; i++) {
-            steps.push({ type: 'compare', indices: [i], array: [...arr], sorted: [] });
-            if (arr[i] === target) {
-                steps.push({ type: 'done', array: [...arr], sorted: [i] });
-                return;
-            }
-        }
-    }
-
-    function binarySearchSteps(arr) {
-        const a = [...arr].sort((x, y) => x - y);
-        currentArray = [...a];
-        const target = a[Math.floor(Math.random() * a.length)];
-        let l = 0, r = a.length - 1;
-        while (l <= r) {
-            const m = Math.floor((l + r) / 2);
-            steps.push({ type: 'compare', indices: [m], array: [...a], sorted: [], pivot: m });
-            if (a[m] === target) {
-                steps.push({ type: 'done', array: [...a], sorted: [m] });
-                return;
-            } else if (a[m] < target) l = m + 1;
-            else r = m - 1;
-        }
+        steps = AlgoDSA.generate(currentAlgo.id, seedValues, optionsFromInputs());
     }
 
     // === Play/Pause/Step/Reset ===
@@ -501,112 +316,120 @@
         paused = false;
         clearTimeout(animTimer);
         steps = [];
+        currentStep = null;
         stepIndex = 0;
         comparisons = 0;
         swaps = 0;
         updateInfo();
         setStatus('Ready');
+        document.getElementById('traceCode').textContent = (currentAlgo?.name || 'Select an algorithm') + ' — press Play or Step to inspect events.';
+        ['varI','varJ','varAJ','varAJ1'].forEach(id=>document.getElementById(id).textContent='—');
+        document.getElementById('stepExplanation').textContent='Read the starting example, then press Step to see the first operation.';
+        document.getElementById('explanationStep').textContent='Before we begin';
+        document.querySelectorAll('#lessonGuide li').forEach(li=>{li.classList.remove('is-active');li.removeAttribute('aria-current');});
+        renderLessonCode();updateInspector(null);
         const playBtn = document.getElementById('vizPlay');
         const pauseBtn = document.getElementById('vizPause');
-        if (playBtn) playBtn.disabled = false;
+        if (playBtn) playBtn.disabled = !currentAlgo;
         if (pauseBtn) pauseBtn.disabled = true;
     }
 
-    function playViz() {
-        if (steps.length === 0) {
-            generateSortSteps();
-            updateInfo();
+    function preparePlayback() {
+        return steps.length>0 || applyInputs();
+    }
+    function setSnapshot(index) {
+        stepIndex=Math.max(0,Math.min(index,steps.length));
+        comparisons=0;swaps=0;
+        for(let i=0;i<stepIndex;i++) {
+            const type=steps[i].type;
+            if(type==='compare')comparisons++;
+            else if(type==='swap')swaps+=2;
+            else if(type==='write'||type==='change')swaps++;
         }
-        sorting = true;
-        paused = false;
-        setStatus('Running');
-        const playBtn = document.getElementById('vizPlay');
-        const pauseBtn = document.getElementById('vizPause');
-        if (playBtn) playBtn.disabled = true;
-        if (pauseBtn) pauseBtn.disabled = false;
+        currentStep=stepIndex?steps[stepIndex-1]:null;
+        currentArray=currentStep?[...currentStep.array]:[...seedValues];
+        if(currentStep){renderBars();updateStepDetails(currentStep);}else {renderPreview();renderLessonCode();updateInspector(null);document.querySelectorAll('#lessonGuide li').forEach(li=>{li.classList.remove('is-active');li.removeAttribute('aria-current');});['varI','varJ','varAJ','varAJ1'].forEach(id=>document.getElementById(id).textContent='—');document.getElementById('traceCode').textContent='Initial example: ['+seedValues.join(', ')+']';document.getElementById('stepExplanation').textContent='This is the starting state, before any operation.';document.getElementById('explanationStep').textContent='Before we begin';}
+        updateInfo();
+        updateInspector(currentStep);
+    }
+    function playViz() {
+        if(!preparePlayback())return;
+        clearTimeout(animTimer);
+        if(stepIndex===steps.length)setSnapshot(0);
+        sorting=true;paused=false;setStatus('Running');
+        document.getElementById('vizPlay').disabled=true;document.getElementById('vizPause').disabled=false;
         runStep();
     }
-
     function runStep() {
-        if (!sorting || paused || stepIndex >= steps.length) {
-            if (stepIndex >= steps.length && sorting) {
-                setStatus('Completed ✓');
-                sorting = false;
-                const playBtn = document.getElementById('vizPlay');
-                const pauseBtn = document.getElementById('vizPause');
-                if (playBtn) playBtn.disabled = false;
-                if (pauseBtn) pauseBtn.disabled = true;
-            }
-            return;
+        if(!sorting||paused)return;
+        if(stepIndex<steps.length)setSnapshot(stepIndex+1);
+        if(stepIndex===steps.length) {
+            sorting=false;setStatus('Completed ✓');document.getElementById('vizPlay').disabled=false;document.getElementById('vizPause').disabled=true;return;
         }
-        const step = steps[stepIndex];
-        currentArray = [...step.array];
-
-        const highlights = {};
-        if (step.type === 'compare') {
-            highlights.comparing = step.indices;
-            comparisons++;
-        } else if (step.type === 'swap') {
-            highlights.swapping = step.indices;
-            swaps++;
-        } else if (step.type === 'done') {
-            highlights.sorted = step.sorted;
-        }
-        if (step.sorted && step.type !== 'done') highlights.sorted = step.sorted;
-        if (step.pivot !== undefined) highlights.pivot = step.pivot;
-
-        renderBars(highlights);
-        stepIndex++;
-        updateInfo();
-
-        // Update trace highlight
-        const traceHighlight = document.getElementById('traceHighlight');
-        if (traceHighlight) {
-            const lineH = 24;
-            const baseLine = step.type === 'compare' ? 4 : step.type === 'swap' ? 5 : 6;
-            traceHighlight.style.top = (16 + (baseLine - 1) * lineH) + 'px';
-        }
-
-        // Update variable tracking
-        if (step.indices && step.indices.length >= 1) {
-            const el = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
-            el('varI', step.indices[0] !== undefined ? step.indices[0] : '-');
-            el('varJ', step.indices[1] !== undefined ? step.indices[1] : '-');
-            el('varAJ', step.indices[0] !== undefined ? currentArray[step.indices[0]] : '-');
-            el('varAJ1', step.indices[1] !== undefined ? currentArray[step.indices[1]] : '-');
-        }
-
-        const delay = Math.max(60, 950 - (animSpeed * 8.5));
-        animTimer = setTimeout(runStep, delay);
+        animTimer=setTimeout(runStep,Math.max(60,950-animSpeed*8.5));
     }
-
     function pauseViz() {
-        paused = true;
-        setStatus('Paused');
-        const playBtn = document.getElementById('vizPlay');
-        const pauseBtn = document.getElementById('vizPause');
-        if (playBtn) playBtn.disabled = false;
-        if (pauseBtn) pauseBtn.disabled = true;
+        clearTimeout(animTimer);sorting=false;paused=true;setStatus('Paused');
+        document.getElementById('vizPlay').disabled=false;document.getElementById('vizPause').disabled=true;
+    }
+    function seekViz(index) {
+        if(!preparePlayback())return;
+        pauseViz();setSnapshot(index);
+        setStatus(stepIndex===0?'Ready':stepIndex===steps.length?'Completed ✓':'Stepping');
+    }
+    function stepViz() {seekViz(stepIndex+1);}
+    function renderLessonCode() {
+        const language=document.getElementById('codeView').value;
+        if(currentAlgo)AlgoCode.render(document.getElementById('lessonCode'),currentAlgo.id,currentStep,language);
+        const link=document.getElementById('languageSource');link.hidden=language==='english';
+        if(!link.hidden)link.href=language==='javascript'?'examples/algorithms.js':AlgoCode.entry(currentAlgo.id,language).sourceUrl;
+    }
+    function updateInspector(step) {
+        const box=document.getElementById('lessonInspector');box.replaceChildren();
+        const entries=[['comparisons',comparisons],['changes / writes',swaps]];
+        const state=step?.state||{};
+        if(step?.indices?.length)entries.push(['positions',step.indices.join(', ')]);
+        if(step?.compareValues)entries.push(['comparing',step.compareValues.join(' and ')]);
+        if(state.sum!==undefined)entries.push(['window sum',state.sum]);
+        if(state.best!==undefined&&state.best!==null)entries.push(['best sum',state.best]);
+        if(state.frontier)entries.push(['queue',state.frontier.join(' → ')||'empty']);
+        if(state.visited)entries.push(['visited',state.visited.join(' → ')||'none']);
+        if(state.removed)entries.push(['removed',state.removed.join(', ')||'none']);
+        if(state.table&&!Array.isArray(state.table[0]))entries.push(['saved answers',state.table.map(v=>v===null?'?':v).join(', ')]);
+        if(state.cell)entries.push(['table cell',`item ${state.cell[0]}, capacity ${state.cell[1]}`]);
+        if(state.root)entries.push(['root',state.root.value]);
+        if(state.left)entries.push(['left buffer',state.left.join(', ')]);
+        if(state.right)entries.push(['right buffer',state.right.join(', ')]);
+        if(state.result!==undefined)entries.push(['answer',state.result]);
+        if(state.found!==undefined)entries.push(['found',String(state.found)]);
+        if(state.distance)entries.push(['distances',Object.entries(state.distance).map(([n,d])=>`${n}: ${d}`).join(' · ')]);
+        for(const[name,value]of entries){const row=document.createElement('div');row.className='inspector-row';const term=document.createElement('dt');term.textContent=name;const val=document.createElement('dd');val.textContent=value;row.append(term,val);box.append(row);}
     }
 
-    function stepViz() {
-        if (steps.length === 0) generateSortSteps();
-        if (stepIndex < steps.length) {
-            paused = true;
-            sorting = true;
-            const step = steps[stepIndex];
-            currentArray = [...step.array];
-            const highlights = {};
-            if (step.type === 'compare') { highlights.comparing = step.indices; comparisons++; }
-            else if (step.type === 'swap') { highlights.swapping = step.indices; swaps++; }
-            else if (step.type === 'done') { highlights.sorted = step.sorted; }
-            if (step.sorted && step.type !== 'done') highlights.sorted = step.sorted;
-            renderBars(highlights);
-            stepIndex++;
-            updateInfo();
-            setStatus('Stepping');
-        }
+    function updateStepDetails(step) {
+        let reason='';
+        const pair=step.compareValues||step.indices?.map(i=>step.array[i])||[];
+        if(step.kind==='compare'&&['bubble','insertion'].includes(currentAlgo.id))reason=pair[0]>pair[1]?`${pair[0]} is bigger than ${pair[1]}, so these neighbors need swapping.`:'These neighbors are already in the right order.';
+        if(step.kind==='compare'&&currentAlgo.id==='selection')reason=pair[1]<pair[0]?`${pair[1]} is smaller; remember it as the new smallest candidate.`:`Keep ${pair[0]} as the smallest candidate so far.`;
+        if(step.kind==='compare'&&currentAlgo.id==='merge')reason=pair[0]<=pair[1]?`Take ${pair[0]} from the left buffer first.`:`Take ${pair[1]} from the right buffer first.`;
+        if(step.kind==='swap'&&['bubble','insertion'].includes(currentAlgo.id))reason=`The smaller value ${step.array[step.indices[0]]} is now on the left; the larger value is on the right.`;
+        const narration=step.message+(reason?' '+reason:'');
+        document.getElementById('stepNarration').textContent=narration;
+        document.getElementById('explanationStep').textContent=`Step ${stepIndex} of ${steps.length}`;
+        const purpose=step.kind==='done'?'The result is ready. You can move backward to revisit how we reached it.':step.kind==='compare'?'This check decides what to do next.':step.kind==='swap'||step.kind==='write'||step.kind==='change'?'The whiteboard now shows the changed state.':'The highlighted items are the ones we are working on now.';
+        document.getElementById('stepExplanation').textContent=narration+' '+purpose+' '+(currentAlgo.guide[step.guide]||'');
+        renderLessonCode();
+        document.getElementById('traceCode').textContent=`${currentAlgo.name} — step ${stepIndex}/${steps.length}\n${step.message}\n${step.array.length?'Values: ['+step.array.join(', ')+']':''}`;
+        document.querySelectorAll('#lessonGuide li').forEach((li,i)=>{li.classList.toggle('is-active',i===step.guide);if(i===step.guide)li.setAttribute('aria-current','step');else li.removeAttribute('aria-current');});
+        const indices=step.indices||step.active||[];
+        const values=[indices[0],indices[1],step.compareValues?.[0]??step.array[indices[0]],step.compareValues?.[1]??step.array[indices[1]]];
+        ['varI','varJ','varAJ','varAJ1'].forEach((id,i)=>document.getElementById(id).textContent=values[i]??'—');
     }
+    document.getElementById('applyExample').addEventListener('click',applyInputs);
+    document.getElementById('codeView').addEventListener('change',renderLessonCode);
+    document.getElementById('vizPrevious').addEventListener('click',()=>seekViz(stepIndex-1));
+    document.getElementById('vizTimeline').addEventListener('input',event=>seekViz(Number(event.target.value)));
+    ['searchTarget','valuesInput','stringInput','graphInput'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{resetViz();document.getElementById('stepNarration').textContent='Input changed. Press Apply, Step, or Play to use it.';}));
 
     // Bind visualizer buttons
     const vizGenerate = document.getElementById('vizGenerate');
@@ -619,12 +442,13 @@
     if (vizPlay) vizPlay.addEventListener('click', playViz);
     if (vizPause) vizPause.addEventListener('click', pauseViz);
     if (vizStep) vizStep.addEventListener('click', stepViz);
-    if (vizReset) vizReset.addEventListener('click', () => { resetViz(); generateArray(); });
+    if (vizReset) vizReset.addEventListener('click', applyInputs);
     if (speedSlider) speedSlider.addEventListener('input', (e) => { animSpeed = parseInt(e.target.value); });
     if (sizeSlider) sizeSlider.addEventListener('input', () => { resetViz(); generateArray(); });
 
     // Init first category
     selectCategory('sorting');
+    collapseOnSelection=true;
 
     // ============================================
     // ALGORITHM BATTLE
@@ -663,45 +487,7 @@
     if (battleAlgoB) battleAlgoB.addEventListener('change', updateBattleComparison);
 
     function sortWithCount(arr, algo) {
-        let comp = 0, sw = 0;
-        const a = [...arr];
-        const start = performance.now();
-        switch (algo) {
-            case 'bubble':
-                for (let i = 0; i < a.length; i++) for (let j = 0; j < a.length - i - 1; j++) { comp++; if (a[j] > a[j + 1]) { [a[j], a[j + 1]] = [a[j + 1], a[j]]; sw++; } }
-                break;
-            case 'selection':
-                for (let i = 0; i < a.length; i++) { let m = i; for (let j = i + 1; j < a.length; j++) { comp++; if (a[j] < a[m]) m = j; } if (m !== i) { [a[i], a[m]] = [a[m], a[i]]; sw++; } }
-                break;
-            case 'insertion':
-                for (let i = 1; i < a.length; i++) { let j = i; while (j > 0 && a[j - 1] > a[j]) { comp++; [a[j - 1], a[j]] = [a[j], a[j - 1]]; sw++; j--; } comp++; }
-                break;
-            case 'merge':
-                function ms(a, l, r) {
-                    if (l >= r) return;
-                    const m = Math.floor((l + r) / 2);
-                    ms(a, l, m); ms(a, m + 1, r);
-                    const t = []; let i = l, j = m + 1;
-                    while (i <= m && j <= r) { comp++; if (a[i] <= a[j]) t.push(a[i++]); else { t.push(a[j++]); sw++; } }
-                    while (i <= m) t.push(a[i++]);
-                    while (j <= r) t.push(a[j++]);
-                    for (let k = 0; k < t.length; k++) a[l + k] = t[k];
-                }
-                ms(a, 0, a.length - 1);
-                break;
-            case 'quick':
-                function qs(a, lo, hi) {
-                    if (lo >= hi) return;
-                    let pivot = a[hi], idx = lo;
-                    for (let j = lo; j < hi; j++) { comp++; if (a[j] < pivot) { [a[idx], a[j]] = [a[j], a[idx]]; sw++; idx++; } }
-                    [a[idx], a[hi]] = [a[hi], a[idx]]; sw++;
-                    qs(a, lo, idx - 1); qs(a, idx + 1, hi);
-                }
-                qs(a, 0, a.length - 1);
-                break;
-        }
-        const time = performance.now() - start;
-        return { sorted: a, comparisons: comp, swaps: sw, time: time.toFixed(2) };
+        return AlgoBattle.measure(arr, algo);
     }
 
     function renderBattleBars(container, arr) {
@@ -753,602 +539,14 @@
     // ============================================
     // PRACTICE ARENA & LEETCODE PROBLEM SOLVER
     // ============================================
-    const LEETCODE_PROBLEMS = [
-        {
-            id: 'two-sum',
-            number: 1,
-            title: 'Two Sum',
-            difficulty: 'Easy',
-            acceptance: '53.2%',
-            tags: ['LeetCode #1', 'Arrays', 'Hash Map'],
-            description: `Given an array of integers <code>nums</code> and an integer <code>target</code>, return <em>indices of the two numbers such that they add up to <code>target</code></em>.<br><br>You may assume that each input would have <strong>exactly one solution</strong>, and you may not use the same element twice. You can return the answer in any order.`,
-            examples: [
-                {
-                    input: 'nums = [2, 7, 11, 15], target = 9',
-                    output: '[0, 1]',
-                    explanation: 'Because nums[0] + nums[1] == 9, we return [0, 1].'
-                },
-                {
-                    input: 'nums = [3, 2, 4], target = 6',
-                    output: '[1, 2]',
-                    explanation: 'nums[1] + nums[2] == 2 + 4 == 6, we return [1, 2].'
-                },
-                {
-                    input: 'nums = [3, 3], target = 6',
-                    output: '[0, 1]',
-                    explanation: 'nums[0] + nums[1] == 3 + 3 == 6, we return [0, 1].'
-                }
-            ],
-            constraints: [
-                '2 <= nums.length <= 10^4',
-                '-10^9 <= nums[i] <= 10^9',
-                '-10^9 <= target <= 10^9',
-                'Only one valid answer exists.',
-                'Follow-up: Can you come up with an algorithm that is less than O(n²) time complexity?'
-            ],
-            hint: 'Use a Hash Map to store numbers you have already visited and their indices: map.set(nums[i], i). For each number, check if (target - nums[i]) already exists in the map.',
-            jsStarter: `/**
- * LeetCode #1: Two Sum
- * @param {number[]} nums
- * @param {number} target
- * @return {number[]}
- */
-function twoSum(nums, target) {
-    const map = new Map();
-    for (let i = 0; i < nums.length; i++) {
-        const complement = target - nums[i];
-        if (map.has(complement)) {
-            return [map.get(complement), i];
-        }
-        map.set(nums[i], i);
-    }
-    return [];
-}`,
-            pyStarter: `class Solution:
-    def twoSum(self, nums: list[int], target: int) -> list[int]:
-        seen = {}
-        for i, n in enumerate(nums):
-            diff = target - n
-            if diff in seen:
-                return [seen[diff], i]
-            seen[n] = i
-        return []`,
-            javaStarter: `class Solution {
-    public int[] twoSum(int[] nums, int target) {
-        Map<Integer, Integer> map = new HashMap<>();
-        for (int i = 0; i < nums.length; i++) {
-            int complement = target - nums[i];
-            if (map.containsKey(complement)) {
-                return new int[] { map.get(complement), i };
-            }
-            map.put(nums[i], i);
-        }
-        return new int[] {};
-    }
-}`,
-            cppStarter: `class Solution {
-public:
-    vector<int> twoSum(vector<int>& nums, int target) {
-        unordered_map<int, int> map;
-        for (int i = 0; i < nums.size(); i++) {
-            int complement = target - nums[i];
-            if (map.count(complement)) {
-                return {map[complement], i};
-            }
-            map[nums[i]] = i;
-        }
-        return {};
-    }
-};`,
-            cStarter: `/**
- * Note: The returned array must be malloced, assume caller calls free().
- */
-int* twoSum(int* nums, int numsSize, int target, int* returnSize) {
-    *returnSize = 2;
-    int* res = (int*)malloc(2 * sizeof(int));
-    for (int i = 0; i < numsSize; i++) {
-        for (int j = i + 1; j < numsSize; j++) {
-            if (nums[i] + nums[j] == target) {
-                res[0] = i;
-                res[1] = j;
-                return res;
-            }
-        }
-    }
-    return res;
-}`,
-            testCases: [
-                { input: 'nums = [2, 7, 11, 15], target = 9', expected: '[0, 1]', run: (fn) => fn([2, 7, 11, 15], 9) },
-                { input: 'nums = [3, 2, 4], target = 6', expected: '[1, 2]', run: (fn) => fn([3, 2, 4], 6) },
-                { input: 'nums = [3, 3], target = 6', expected: '[0, 1]', run: (fn) => fn([3, 3], 6) }
-            ]
-        },
-        {
-            id: 'reverse-linked-list',
-            number: 206,
-            title: 'Reverse a Linked List',
-            difficulty: 'Easy',
-            acceptance: '76.8%',
-            tags: ['LeetCode #206', 'Linked List', 'Pointers'],
-            description: `Given the head of a singly linked list represented as an array of values, reverse the list, and return <em>the reversed array of values</em>.`,
-            examples: [
-                {
-                    input: 'head = [1, 2, 3, 4, 5]',
-                    output: '[5, 4, 3, 2, 1]',
-                    explanation: 'Reversing list 1->2->3->4->5 produces 5->4->3->2->1.'
-                },
-                {
-                    input: 'head = [1, 2]',
-                    output: '[2, 1]',
-                    explanation: 'Reversing 1->2 produces 2->1.'
-                }
-            ],
-            constraints: [
-                'The number of nodes in the list is the range [0, 5000].',
-                '-5000 <= Node.val <= 5000'
-            ],
-            hint: 'Use three pointers (prev = null, curr = head, next) or iteratively reverse the links in a single pass!',
-            jsStarter: `/**
- * LeetCode #206: Reverse Linked List
- * @param {number[]} head
- * @return {number[]}
- */
-function reverseList(head) {
-    const reversed = [];
-    for (let i = head.length - 1; i >= 0; i--) {
-        reversed.push(head[i]);
-    }
-    return reversed;
-}`,
-            pyStarter: `class Solution:
-    def reverseList(self, head: list[int]) -> list[int]:
-        return head[::-1]`,
-            javaStarter: `class Solution {
-    public int[] reverseList(int[] head) {
-        int[] res = new int[head.length];
-        for (int i = 0; i < head.length; i++) {
-            res[i] = head[head.length - 1 - i];
-        }
-        return res;
-    }
-}`,
-            cppStarter: `class Solution {
-public:
-    vector<int> reverseList(vector<int>& head) {
-        vector<int> res(head.rbegin(), head.rend());
-        return res;
-    }
-};`,
-            cStarter: `int* reverseList(int* head, int headSize, int* returnSize) {
-    *returnSize = headSize;
-    int* res = (int*)malloc(headSize * sizeof(int));
-    for (int i = 0; i < headSize; i++) {
-        res[i] = head[headSize - 1 - i];
-    }
-    return res;
-}`,
-            testCases: [
-                { input: 'head = [1, 2, 3, 4, 5]', expected: '[5, 4, 3, 2, 1]', run: (fn) => fn([1, 2, 3, 4, 5]) },
-                { input: 'head = [1, 2]', expected: '[2, 1]', run: (fn) => fn([1, 2]) },
-                { input: 'head = []', expected: '[]', run: (fn) => fn([]) }
-            ]
-        },
-        {
-            id: 'valid-parentheses',
-            number: 20,
-            title: 'Valid Parentheses',
-            difficulty: 'Easy',
-            acceptance: '41.1%',
-            tags: ['LeetCode #20', 'Stack', 'String'],
-            description: `Given a string <code>s</code> containing just the characters <code>'('</code>, <code>')'</code>, <code>'{'</code>, <code>'}'</code>, <code>'['</code> and <code>']'</code>, determine if the input string is valid.<br><br>An input string is valid if open brackets are closed by the same type of brackets in the correct order.`,
-            examples: [
-                { input: 's = "()"', output: 'true', explanation: 'Matching pair of parentheses.' },
-                { input: 's = "()[]{}"', output: 'true', explanation: 'All three pairs match in proper order.' },
-                { input: 's = "(]"', output: 'false', explanation: 'Mismatched closing bracket.' }
-            ],
-            constraints: [
-                '1 <= s.length <= 10^4',
-                's consists of parentheses only "()[]{}"'
-            ],
-            hint: 'Use a Stack! When encountering an opening bracket, push it. When encountering a closing bracket, check if it matches the top of the stack.',
-            jsStarter: `/**
- * LeetCode #20: Valid Parentheses
- * @param {string} s
- * @return {boolean}
- */
-function isValid(s) {
-    const stack = [];
-    const pairs = { ')': '(', '}': '{', ']': '[' };
-    for (const char of s) {
-        if (char === '(' || char === '{' || char === '[') {
-            stack.push(char);
-        } else {
-            if (stack.pop() !== pairs[char]) return false;
-        }
-    }
-    return stack.length === 0;
-}`,
-            pyStarter: `class Solution:
-    def isValid(self, s: str) -> bool:
-        stack = []
-        pairs = {')': '(', '}': '{', ']': '['}
-        for c in s:
-            if c in '({[':
-                stack.append(c)
-            elif not stack or stack.pop() != pairs[c]:
-                return False
-        return len(stack) == 0`,
-            javaStarter: `class Solution {
-    public boolean isValid(String s) {
-        Stack<Character> stack = new Stack<>();
-        for (char c : s.toCharArray()) {
-            if (c == '(') stack.push(')');
-            else if (c == '{') stack.push('}');
-            else if (c == '[') stack.push(']');
-            else if (stack.isEmpty() || stack.pop() != c) return false;
-        }
-        return stack.isEmpty();
-    }
-}`,
-            cppStarter: `class Solution {
-public:
-    bool isValid(string s) {
-        stack<char> st;
-        for (char c : s) {
-            if (c == '(') st.push(')');
-            else if (c == '{') st.push('}');
-            else if (c == '[') st.push(']');
-            else if (st.empty() || st.top() != c) return false;
-            else st.pop();
-        }
-        return st.empty();
-    }
-};`,
-            cStarter: `bool isValid(char* s) {
-    int len = strlen(s);
-    char stack[10005];
-    int top = -1;
-    for (int i = 0; i < len; i++) {
-        char c = s[i];
-        if (c == '(' || c == '{' || c == '[') {
-            stack[++top] = c;
-        } else {
-            if (top < 0) return false;
-            char open = stack[top--];
-            if (c == ')' && open != '(') return false;
-            if (c == '}' && open != '{') return false;
-            if (c == ']' && open != '[') return false;
-        }
-    }
-    return top == -1;
-}`,
-            testCases: [
-                { input: 's = "()"', expected: 'true', run: (fn) => fn("()") },
-                { input: 's = "()[]{}"', expected: 'true', run: (fn) => fn("()[]{}") },
-                { input: 's = "(]"', expected: 'false', run: (fn) => fn("(]") }
-            ]
-        },
-        {
-            id: 'merge-sorted-lists',
-            number: 21,
-            title: 'Merge Two Sorted Lists',
-            difficulty: 'Easy',
-            acceptance: '64.2%',
-            tags: ['LeetCode #21', 'Linked List', 'Recursion'],
-            description: `You are given the heads of two sorted linked lists represented as arrays <code>list1</code> and <code>list2</code>.<br><br>Merge the two lists into one <strong>sorted</strong> list and return it.`,
-            examples: [
-                { input: 'list1 = [1, 2, 4], list2 = [1, 3, 4]', output: '[1, 1, 2, 3, 4, 4]', explanation: 'Elements merged in ascending order.' },
-                { input: 'list1 = [], list2 = []', output: '[]', explanation: 'Both lists are empty.' }
-            ],
-            constraints: [
-                'The number of nodes in both lists is in the range [0, 50].',
-                '-100 <= Node.val <= 100',
-                'Both list1 and list2 are sorted in non-decreasing order.'
-            ],
-            hint: 'Use two pointers comparing list1[i] and list2[j], appending the smaller element to your result.',
-            jsStarter: `/**
- * LeetCode #21: Merge Two Sorted Lists
- * @param {number[]} list1
- * @param {number[]} list2
- * @return {number[]}
- */
-function mergeTwoLists(list1, list2) {
-    const res = [];
-    let i = 0, j = 0;
-    while (i < list1.length && j < list2.length) {
-        if (list1[i] <= list2[j]) res.push(list1[i++]);
-        else res.push(list2[j++]);
-    }
-    while (i < list1.length) res.push(list1[i++]);
-    while (j < list2.length) res.push(list2[j++]);
-    return res;
-}`,
-            pyStarter: `class Solution:
-    def mergeTwoLists(self, list1: list[int], list2: list[int]) -> list[int]:
-        return sorted(list1 + list2)`,
-            javaStarter: `class Solution {
-    public int[] mergeTwoLists(int[] list1, int[] list2) {
-        int[] res = new int[list1.length + list2.length];
-        int i = 0, j = 0, k = 0;
-        while (i < list1.length && j < list2.length) {
-            if (list1[i] <= list2[j]) res[k++] = list1[i++];
-            else res[k++] = list2[j++];
-        }
-        while (i < list1.length) res[k++] = list1[i++];
-        while (j < list2.length) res[k++] = list2[j++];
-        return res;
-    }
-}`,
-            cppStarter: `class Solution {
-public:
-    vector<int> mergeTwoLists(vector<int>& list1, vector<int>& list2) {
-        vector<int> res;
-        int i = 0, j = 0;
-        while (i < list1.size() && j < list2.size()) {
-            if (list1[i] <= list2[j]) res.push_back(list1[i++]);
-            else res.push_back(list2[j++]);
-        }
-        while (i < list1.size()) res.push_back(list1[i++]);
-        while (j < list2.size()) res.push_back(list2[j++]);
-        return res;
-    }
-};`,
-            cStarter: `int* mergeTwoLists(int* l1, int l1Size, int* l2, int l2Size, int* returnSize) {
-    *returnSize = l1Size + l2Size;
-    int* res = (int*)malloc((*returnSize) * sizeof(int));
-    int i = 0, j = 0, k = 0;
-    while (i < l1Size && j < l2Size) {
-        if (l1[i] <= l2[j]) res[k++] = l1[i++];
-        else res[k++] = l2[j++];
-    }
-    while (i < l1Size) res[k++] = l1[i++];
-    while (j < l2Size) res[k++] = l2[j++];
-    return res;
-}`,
-            testCases: [
-                { input: 'list1 = [1, 2, 4], list2 = [1, 3, 4]', expected: '[1, 1, 2, 3, 4, 4]', run: (fn) => fn([1, 2, 4], [1, 3, 4]) },
-                { input: 'list1 = [], list2 = []', expected: '[]', run: (fn) => fn([], []) },
-                { input: 'list1 = [], list2 = [0]', expected: '[0]', run: (fn) => fn([], [0]) }
-            ]
-        },
-        {
-            id: 'max-subarray',
-            number: 53,
-            title: "Maximum Subarray (Kadane's)",
-            difficulty: 'Medium',
-            acceptance: '51.3%',
-            tags: ['LeetCode #53', 'Arrays', 'Dynamic Programming'],
-            description: `Given an integer array <code>nums</code>, find the subarray with the largest sum, and return <em>its sum</em>.`,
-            examples: [
-                { input: 'nums = [-2, 1, -3, 4, -1, 2, 1, -5, 4]', output: '6', explanation: 'The subarray [4, -1, 2, 1] has the largest sum 6.' },
-                { input: 'nums = [1]', output: '1', explanation: 'Single element array.' },
-                { input: 'nums = [5, 4, -1, 7, 8]', output: '23', explanation: 'The subarray [5, 4, -1, 7, 8] has the largest sum 23.' }
-            ],
-            constraints: [
-                '1 <= nums.length <= 10^5',
-                '-10^4 <= nums[i] <= 10^4'
-            ],
-            hint: "Kadane's Algorithm: Maintain currentMax = max(nums[i], currentMax + nums[i]), and update maxSoFar.",
-            jsStarter: `/**
- * LeetCode #53: Maximum Subarray
- * @param {number[]} nums
- * @return {number}
- */
-function maxSubArray(nums) {
-    let maxSoFar = nums[0];
-    let currentMax = nums[0];
-    for (let i = 1; i < nums.length; i++) {
-        currentMax = Math.max(nums[i], currentMax + nums[i]);
-        maxSoFar = Math.max(maxSoFar, currentMax);
-    }
-    return maxSoFar;
-}`,
-            pyStarter: `class Solution:
-    def maxSubArray(self, nums: list[int]) -> int:
-        cur_max = max_so_far = nums[0]
-        for x in nums[1:]:
-            cur_max = max(x, cur_max + x)
-            max_so_far = max(max_so_far, cur_max)
-        return max_so_far`,
-            javaStarter: `class Solution {
-    public int maxSubArray(int[] nums) {
-        int maxSoFar = nums[0];
-        int currentMax = nums[0];
-        for (int i = 1; i < nums.length; i++) {
-            currentMax = Math.max(nums[i], currentMax + nums[i]);
-            maxSoFar = Math.max(maxSoFar, currentMax);
-        }
-        return maxSoFar;
-    }
-}`,
-            cppStarter: `class Solution {
-public:
-    int maxSubArray(vector<int>& nums) {
-        int maxSoFar = nums[0], currentMax = nums[0];
-        for (size_t i = 1; i < nums.size(); i++) {
-            currentMax = max(nums[i], currentMax + nums[i]);
-            maxSoFar = max(maxSoFar, currentMax);
-        }
-        return maxSoFar;
-    }
-};`,
-            cStarter: `int maxSubArray(int* nums, int numsSize) {
-    int maxSoFar = nums[0];
-    int currentMax = nums[0];
-    for (int i = 1; i < numsSize; i++) {
-        currentMax = nums[i] > (currentMax + nums[i]) ? nums[i] : (currentMax + nums[i]);
-        if (currentMax > maxSoFar) maxSoFar = currentMax;
-    }
-    return maxSoFar;
-}`,
-            testCases: [
-                { input: 'nums = [-2, 1, -3, 4, -1, 2, 1, -5, 4]', expected: '6', run: (fn) => fn([-2, 1, -3, 4, -1, 2, 1, -5, 4]) },
-                { input: 'nums = [1]', expected: '1', run: (fn) => fn([1]) },
-                { input: 'nums = [5, 4, -1, 7, 8]', expected: '23', run: (fn) => fn([5, 4, -1, 7, 8]) }
-            ]
-        },
-        {
-            id: 'best-time-stock',
-            number: 121,
-            title: 'Best Time to Buy and Sell Stock',
-            difficulty: 'Easy',
-            acceptance: '54.5%',
-            tags: ['LeetCode #121', 'Arrays', 'Two Pointers'],
-            description: `You are given an array <code>prices</code> where <code>prices[i]</code> is the price of a given stock on the <code>i-th</code> day.<br><br>Return <em>the maximum profit you can achieve</em> by choosing a day to buy and a later day to sell. If no profit can be achieved, return <code>0</code>.`,
-            examples: [
-                { input: 'prices = [7, 1, 5, 3, 6, 4]', output: '5', explanation: 'Buy on day 2 (price = 1) and sell on day 5 (price = 6), profit = 6 - 1 = 5.' },
-                { input: 'prices = [7, 6, 4, 3, 1]', output: '0', explanation: 'No transactions are done and max profit = 0.' }
-            ],
-            constraints: [
-                '1 <= prices.length <= 10^5',
-                '0 <= prices[i] <= 10^4'
-            ],
-            hint: 'Keep track of minPrice seen so far. At each day, calculate profit = price - minPrice.',
-            jsStarter: `/**
- * LeetCode #121: Best Time to Buy and Sell Stock
- * @param {number[]} prices
- * @return {number}
- */
-function maxProfit(prices) {
-    let minPrice = Infinity;
-    let maxProfit = 0;
-    for (let price of prices) {
-        if (price < minPrice) minPrice = price;
-        else if (price - minPrice > maxProfit) maxProfit = price - minPrice;
-    }
-    return maxProfit;
-}`,
-            pyStarter: `class Solution:
-    def maxProfit(self, prices: list[int]) -> int:
-        min_p = float('inf')
-        profit = 0
-        for p in prices:
-            min_p = min(min_p, p)
-            profit = max(profit, p - min_p)
-        return profit`,
-            javaStarter: `class Solution {
-    public int maxProfit(int[] prices) {
-        int minPrice = Integer.MAX_VALUE;
-        int maxProfit = 0;
-        for (int price : prices) {
-            if (price < minPrice) minPrice = price;
-            else if (price - minPrice > maxProfit) maxProfit = price - minPrice;
-        }
-        return maxProfit;
-    }
-}`,
-            cppStarter: `class Solution {
-public:
-    int maxProfit(vector<int>& prices) {
-        int minPrice = INT_MAX, maxProfit = 0;
-        for (int p : prices) {
-            if (p < minPrice) minPrice = p;
-            else maxProfit = max(maxProfit, p - minPrice);
-        }
-        return maxProfit;
-    }
-};`,
-            cStarter: `int maxProfit(int* prices, int pricesSize) {
-    int minPrice = 2147483647;
-    int maxProfit = 0;
-    for (int i = 0; i < pricesSize; i++) {
-        if (prices[i] < minPrice) minPrice = prices[i];
-        else if (prices[i] - minPrice > maxProfit) maxProfit = prices[i] - minPrice;
-    }
-    return maxProfit;
-}`,
-            testCases: [
-                { input: 'prices = [7, 1, 5, 3, 6, 4]', expected: '5', run: (fn) => fn([7, 1, 5, 3, 6, 4]) },
-                { input: 'prices = [7, 6, 4, 3, 1]', expected: '0', run: (fn) => fn([7, 6, 4, 3, 1]) },
-                { input: 'prices = [2, 4, 1]', expected: '2', run: (fn) => fn([2, 4, 1]) }
-            ]
-        },
-        {
-            id: 'climbing-stairs',
-            number: 70,
-            title: 'Climbing Stairs',
-            difficulty: 'Easy',
-            acceptance: '52.7%',
-            tags: ['LeetCode #70', 'Dynamic Programming', 'Memoization'],
-            description: `You are climbing a staircase. It takes <code>n</code> steps to reach the top. Each time you can either climb <code>1</code> or <code>2</code> steps. In how many distinct ways can you climb to the top?`,
-            examples: [
-                { input: 'n = 2', output: '2', explanation: '1. 1 step + 1 step\\n2. 2 steps' },
-                { input: 'n = 3', output: '3', explanation: '1. 1 step + 1 step + 1 step\\n2. 1 step + 2 steps\\n3. 2 steps + 1 step' }
-            ],
-            constraints: [
-                '1 <= n <= 45'
-            ],
-            hint: 'ways(n) = ways(n-1) + ways(n-2). This is equivalent to the Fibonacci sequence!',
-            jsStarter: `/**
- * LeetCode #70: Climbing Stairs
- * @param {number} n
- * @return {number}
- */
-function climbStairs(n) {
-    if (n <= 2) return n;
-    let prev2 = 1, prev1 = 2;
-    for (let i = 3; i <= n; i++) {
-        let curr = prev1 + prev2;
-        prev2 = prev1;
-        prev1 = curr;
-    }
-    return prev1;
-}`,
-            pyStarter: `class Solution:
-    def climbStairs(self, n: int) -> int:
-        if n <= 2: return n
-        a, b = 1, 2
-        for _ in range(3, n + 1):
-            a, b = b, a + b
-        return b`,
-            javaStarter: `class Solution {
-    public int climbStairs(int n) {
-        if (n <= 2) return n;
-        int prev2 = 1, prev1 = 2;
-        for (int i = 3; i <= n; i++) {
-            int curr = prev1 + prev2;
-            prev2 = prev1;
-            prev1 = curr;
-        }
-        return prev1;
-    }
-}`,
-            cppStarter: `class Solution {
-public:
-    int climbStairs(int n) {
-        if (n <= 2) return n;
-        int prev2 = 1, prev1 = 2;
-        for (int i = 3; i <= n; i++) {
-            int curr = prev1 + prev2;
-            prev2 = prev1;
-            prev1 = curr;
-        }
-        return prev1;
-    }
-};`,
-            cStarter: `int climbStairs(int n) {
-    if (n <= 2) return n;
-    int prev2 = 1, prev1 = 2;
-    for (int i = 3; i <= n; i++) {
-        int curr = prev1 + prev2;
-        prev2 = prev1;
-        prev1 = curr;
-    }
-    return prev1;
-}`,
-            testCases: [
-                { input: 'n = 2', expected: '2', run: (fn) => fn(2) },
-                { input: 'n = 3', expected: '3', run: (fn) => fn(3) },
-                { input: 'n = 4', expected: '5', run: (fn) => fn(4) }
-            ]
-        }
-    ];
+    const LEETCODE_PROBLEMS = AlgoProblems;
 
     let currentProblemIndex = 0;
     let activeTestIndex = 0;
     let latestTestResults = [];
 
     function getStarterCode(p, lang) {
+        if(AlgoAPI.enabled&&p.starters?.[lang])return p.starters[lang];
         if (lang === 'python') return p.pyStarter || p.jsStarter;
         if (lang === 'java') return p.javaStarter || p.jsStarter;
         if (lang === 'cpp') return p.cppStarter || p.jsStarter;
@@ -1373,12 +571,19 @@ public:
     const submitSuccessBanner = document.getElementById('submitSuccessBanner');
     const testRunStatusText = document.getElementById('testRunStatusText');
 
+    const progressKey = 'algoverse_progress_' + (userData.email || userData.name || 'guest');
+    const draftKey = (p, lang) => progressKey + '_draft_' + p.id + '_' + lang;
+    let executionVersion = 0;
     function loadProblem(index) {
+        executionVersion++;
+        btnRunCode.disabled = false; btnSubmitCode.disabled = false;
         if (index < 0) index = LEETCODE_PROBLEMS.length - 1;
         if (index >= LEETCODE_PROBLEMS.length) index = 0;
         currentProblemIndex = index;
         latestTestResults = [];
         const p = LEETCODE_PROBLEMS[index];
+        document.getElementById('practiceSolverView').dataset.problem=p.id;
+        document.dispatchEvent(new CustomEvent('algo-problem',{detail:p.id}));
 
         // Populate top bar metadata
         const tagEl = document.getElementById('solverProblemIdTag');
@@ -1396,7 +601,7 @@ public:
         if (titleEl) titleEl.textContent = `${p.number}. ${p.title}`;
         const tagsContainer = document.getElementById('solverTags');
         if (tagsContainer) {
-            tagsContainer.innerHTML = p.tags.map(t => `<span class="tag">${t}</span>`).join('');
+            tagsContainer.innerHTML = p.tags.map(t => `<span class="tag">${AlgoAPI.escape(t)}</span>`).join('');
         }
 
         // Description
@@ -1409,15 +614,15 @@ public:
             exContainer.innerHTML = p.examples.map((ex, i) => `
                 <div class="example-card">
                     <h5>Example ${i + 1}:</h5>
-                    <pre><strong>Input:</strong> ${ex.input}\n<strong>Output:</strong> ${ex.output}${ex.explanation ? `\n<strong>Explanation:</strong> ${ex.explanation}` : ''}</pre>
-                </div>
+                    <pre><strong>Input:</strong> ${AlgoAPI.escape(ex.input)}\n<strong>Output:</strong> ${AlgoAPI.escape(ex.output)}${ex.explanation ? `\n<strong>Explanation:</strong> ${AlgoAPI.escape(ex.explanation)}` : ''}</pre>
+                </button>
             `).join('');
         }
 
         // Constraints
         const consList = document.getElementById('solverConstraints');
         if (consList) {
-            consList.innerHTML = p.constraints.map(c => `<li>${c}</li>`).join('');
+            consList.innerHTML = p.constraints.map(c => `<li>${AlgoAPI.escape(c)}</li>`).join('');
         }
 
         // Hint
@@ -1428,7 +633,7 @@ public:
         // Code Editor content
         const lang = editorLangSelect ? editorLangSelect.value : 'javascript';
         if (codeEditorInput) {
-            codeEditorInput.value = getStarterCode(p, lang);
+            codeEditorInput.value = AlgoStore.read(draftKey(p, lang), getStarterCode(p, lang));
             updateLineNumbers();
         }
 
@@ -1497,7 +702,7 @@ public:
     }
 
     if (codeEditorInput) {
-        codeEditorInput.addEventListener('input', updateLineNumbers);
+        codeEditorInput.addEventListener('input', () => { updateLineNumbers(); AlgoStore.write(draftKey(LEETCODE_PROBLEMS[currentProblemIndex], editorLangSelect.value), codeEditorInput.value); });
         // Allow Tab indentation inside textarea
         codeEditorInput.addEventListener('keydown', (e) => {
             if (e.key === 'Tab') {
@@ -1507,6 +712,7 @@ public:
                 codeEditorInput.value = codeEditorInput.value.substring(0, start) + '    ' + codeEditorInput.value.substring(end);
                 codeEditorInput.selectionStart = codeEditorInput.selectionEnd = start + 4;
                 updateLineNumbers();
+                AlgoStore.write(draftKey(LEETCODE_PROBLEMS[currentProblemIndex], editorLangSelect.value), codeEditorInput.value);
             }
         });
     }
@@ -1515,8 +721,9 @@ public:
     if (editorLangSelect) {
         editorLangSelect.addEventListener('change', () => {
             const p = LEETCODE_PROBLEMS[currentProblemIndex];
+            executionVersion++; btnRunCode.disabled = false; btnSubmitCode.disabled = false;
             if (codeEditorInput) {
-                codeEditorInput.value = getStarterCode(p, editorLangSelect.value);
+                codeEditorInput.value = AlgoStore.read(draftKey(p, editorLangSelect.value), getStarterCode(p, editorLangSelect.value));
                 updateLineNumbers();
             }
         });
@@ -1529,6 +736,7 @@ public:
             const lang = editorLangSelect ? editorLangSelect.value : 'javascript';
             if (codeEditorInput) {
                 codeEditorInput.value = getStarterCode(p, lang);
+                AlgoStore.write(draftKey(p, lang), codeEditorInput.value);
                 updateLineNumbers();
             }
         });
@@ -1536,9 +744,9 @@ public:
 
     // Copy code
     if (editorCopyBtn) {
-        editorCopyBtn.addEventListener('click', () => {
+        editorCopyBtn.addEventListener('click', async () => {
             if (codeEditorInput) {
-                navigator.clipboard.writeText(codeEditorInput.value);
+                try { await navigator.clipboard.writeText(codeEditorInput.value); } catch { testRunStatusText.textContent = 'Copy unavailable. Select the code and copy manually.'; return; }
                 editorCopyBtn.textContent = '✓ Copied!';
                 setTimeout(() => { editorCopyBtn.textContent = '📋 Copy'; }, 1500);
             }
@@ -1546,7 +754,7 @@ public:
     }
 
     // Hint toggle
-    if (hintToggleBtn && hintContent) {
+    if (hintToggleBtn && hintContent && !AlgoAPI.enabled) {
         hintToggleBtn.addEventListener('click', () => {
             const isHidden = hintContent.style.display === 'none';
             hintContent.style.display = isHidden ? 'block' : 'none';
@@ -1556,127 +764,60 @@ public:
     }
 
     // Run Code and Submit
-    function executeUserSolution(isSubmit = false) {
+    async function executeUserSolution(isSubmit = false) {
         const p = LEETCODE_PROBLEMS[currentProblemIndex];
-        const userCode = codeEditorInput ? codeEditorInput.value.trim() : '';
-        const lang = editorLangSelect ? editorLangSelect.value : 'javascript';
-        if (testRunStatusText) testRunStatusText.textContent = isSubmit ? 'Evaluating submissions...' : 'Running test cases...';
-
+        if (editorLangSelect.value !== 'javascript' && !AlgoAPI.enabled) {
+            testRunStatusText.textContent = 'Execution is available only for JavaScript.'; return;
+        }
+        const version = ++executionVersion;
+        submitSuccessBanner.style.display = 'none';
         latestTestResults = [];
-
+        btnRunCode.disabled = true; btnSubmitCode.disabled = true;
+        testRunStatusText.textContent = 'Running in isolated sandbox…';
         try {
-            let runner = null;
-
-            if (lang === 'javascript') {
-                const fnName = p.id === 'two-sum' ? 'twoSum' :
-                               p.id === 'reverse-linked-list' ? 'reverseList' :
-                               p.id === 'valid-parentheses' ? 'isValid' :
-                               p.id === 'merge-sorted-lists' ? 'mergeTwoLists' :
-                               p.id === 'max-subarray' ? 'maxSubArray' :
-                               p.id === 'best-time-stock' ? 'maxProfit' : 'climbStairs';
-                
-                runner = new Function(`
-                    ${userCode}
-                    return typeof ${fnName} === 'function' ? ${fnName} : null;
-                `)();
-
-                if (!runner) {
-                    throw new Error(`Function "${fnName}" is not defined or valid in your code.`);
-                }
-            } else {
-                // Multi-language validation for Python, Java, C++, C
-                if (!userCode || userCode.length < 15) {
-                    throw new Error(`Incomplete code. Please write your ${lang.toUpperCase()} solution.`);
-                }
-                const openBraces = (userCode.match(/{/g) || []).length;
-                const closeBraces = (userCode.match(/}/g) || []).length;
-                if (lang !== 'python' && openBraces !== closeBraces) {
-                    throw new Error(`Syntax Error: Mismatched curly braces { } in ${lang.toUpperCase()} code.`);
-                }
-
-                // Reference runner for valid executions across languages
-                runner = new Function(`
-                    ${p.jsStarter}
-                    const fnName = '${p.id === 'two-sum' ? 'twoSum' : p.id === 'reverse-linked-list' ? 'reverseList' : p.id === 'valid-parentheses' ? 'isValid' : p.id === 'merge-sorted-lists' ? 'mergeTwoLists' : p.id === 'max-subarray' ? 'maxSubArray' : p.id === 'best-time-stock' ? 'maxProfit' : 'climbStairs'}';
-                    return typeof eval(fnName) === 'function' ? eval(fnName) : null;
-                `)();
-            }
-
-            let allPassed = true;
-            p.testCases.forEach((tc, idx) => {
-                const res = tc.run(runner);
-                const actualStr = JSON.stringify(res);
-
-                let passed = false;
-                if (p.id === 'two-sum' && Array.isArray(res)) {
-                    // Order-independent index check for Two Sum
-                    try {
-                        const sortedActual = [...res].sort((a,b) => a - b);
-                        const expectedArr = JSON.parse(tc.expected).sort((a,b) => a - b);
-                        passed = JSON.stringify(sortedActual) === JSON.stringify(expectedArr);
-                    } catch (e) {
-                        passed = false;
-                    }
-                } else {
-                    const expectedClean = tc.expected.replace(/\\s+/g, '');
-                    const actualClean = actualStr ? actualStr.replace(/\\s+/g, '') : '';
-                    passed = actualClean === expectedClean || String(res).trim() === tc.expected.trim();
-                }
-
-                latestTestResults[idx] = {
-                    actual: actualStr,
-                    passed: passed
-                };
-
-                const dot = document.querySelector(`#testTab${idx} .test-tab-dot`);
-                if (dot) {
-                    dot.className = passed ? 'test-tab-dot pass' : 'test-tab-dot';
-                    dot.style.color = passed ? '#22c55e' : '#ef4444';
-                }
-
-                if (!passed) allPassed = false;
-
-                if (idx === activeTestIndex) {
-                    const actualRow = document.getElementById('actualOutputRow');
-                    const actualVal = document.getElementById('testActualVal');
-                    if (actualRow && actualVal) {
-                        actualRow.style.display = 'block';
-                        actualVal.textContent = actualStr;
-                        actualVal.style.color = passed ? '#34d399' : '#ef4444';
-                    }
-                }
+            const fnName = {'two-sum':'twoSum','reverse-linked-list':'reverseList','valid-parentheses':'isValid','merge-sorted-lists':'mergeTwoLists','max-subarray':'maxSubArray','best-time-stock':'maxProfit','climbing-stairs':'climbStairs'}[p.id] || 'climbStairs';
+            const tests = p.testCases.map(tc => {
+                let args;
+                tc.run((...values) => { args = values; });
+                return {args, expected: JSON.parse(tc.expected)};
             });
-
-            if (testRunStatusText) {
-                const langLabel = lang.toUpperCase();
-                testRunStatusText.textContent = allPassed 
-                    ? `✓ All test cases passed (${langLabel} • 2ms)` 
-                    : `⚠ Some test cases failed (${langLabel})`;
-            }
-
+            const result = AlgoAPI.enabled ? await AlgoAPI.request('/problems/'+encodeURIComponent(p.id)+'/execute',{method:'POST',body:JSON.stringify({code:codeEditorInput.value,language:editorLangSelect.value,submit:isSubmit})}) : await AlgoRunner.run(codeEditorInput.value, fnName, tests, p.id === 'two-sum');
+            if(result.error)throw new Error(result.error);
+            if (version !== executionVersion) return;
+            latestTestResults = result.results;
+            latestTestResults.forEach((r,i) => {
+                const dot = document.querySelector(`#testTab${i} .test-tab-dot`);
+                if (dot) {dot.className = 'test-tab-dot'; dot.style.color = r.passed ? '#22c55e' : '#ef4444';}
+            });
+            const allPassed = AlgoAPI.enabled ? result.accepted : latestTestResults.every(r => r.passed);
+            testRunStatusText.textContent = `${allPassed ? (AlgoAPI.enabled&&isSubmit?'✓ Accepted by server':'✓ All sample tests passed') : 'Some tests failed'} (${editorLangSelect.value} • ${result.time.toFixed(2)}ms)`;
+            if(AlgoAPI.enabled)document.dispatchEvent(new CustomEvent('algo-feedback',{detail:result.feedback}));
+            selectTestTab(activeTestIndex);
             if (isSubmit && allPassed) {
-                if (submitSuccessBanner) submitSuccessBanner.style.display = 'flex';
-                // Mark problem solved in list view
-                const card = document.querySelector(`.problem-card[data-problem="${p.id}"]`);
-                if (card) {
-                    const statusIcon = card.querySelector('.problem-status');
-                    if (statusIcon) {
-                        statusIcon.className = 'problem-status solved';
-                        statusIcon.textContent = '✓';
-                    }
-                }
+                const progress = AlgoStore.read(progressKey, {});
+                progress[p.id] = {solved:true, submittedAt:Date.now()};
+                AlgoStore.write(progressKey, progress);
+                if(AlgoAPI.enabled)await AlgoAPI.refresh();
+                submitSuccessBanner.style.display = 'flex'; restoreSolved();
             }
+            if(AlgoAPI.enabled&&isSubmit&&!allPassed)await AlgoAPI.refresh();
         } catch (err) {
-            if (testRunStatusText) testRunStatusText.textContent = 'Syntax / Compilation error';
-            const actualRow = document.getElementById('actualOutputRow');
-            const actualVal = document.getElementById('testActualVal');
-            if (actualRow && actualVal) {
-                actualRow.style.display = 'block';
-                actualVal.textContent = `Error: ${err.message}`;
-                actualVal.style.color = '#ef4444';
-            }
+            if (version !== executionVersion) return;
+            testRunStatusText.textContent = 'Execution failed: ' + err.message;
+            document.getElementById('actualOutputRow').style.display = 'block';
+            document.getElementById('testActualVal').textContent = err.message;
+        } finally {
+            if (version === executionVersion) {btnRunCode.disabled = false; btnSubmitCode.disabled = false;}
         }
     }
+    function restoreSolved() {
+        const progress = AlgoStore.read(progressKey, {});
+        document.querySelectorAll('.problem-card').forEach(card => {
+            const icon = card.querySelector('.problem-status');
+            if (icon) {const solved = !!progress[card.dataset.problem]?.solved; icon.className = 'problem-status' + (solved ? ' solved' : ''); icon.textContent = solved ? '✓' : '○';}
+        });
+    }
+    restoreSolved();
 
     if (btnRunCode) btnRunCode.addEventListener('click', () => executeUserSolution(false));
     if (btnSubmitCode) btnSubmitCode.addEventListener('click', () => executeUserSolution(true));
@@ -1727,6 +868,8 @@ public:
     // Attach click listeners to problem cards and "Solve →" buttons
     document.querySelectorAll('.problem-card').forEach(card => {
         const pId = card.dataset.problem;
+        card.tabIndex = 0; card.setAttribute('role','button');
+        card.addEventListener('keydown', event => {if(event.target===card && ['Enter',' '].includes(event.key)){event.preventDefault();openSolver(pId);}});
         const solveBtn = card.querySelector('.problem-action');
         if (solveBtn) {
             solveBtn.addEventListener('click', (e) => {
@@ -1762,7 +905,10 @@ public:
         });
     }
 
-    // Init generate on first load
-    generateArray();
+    // Landing-page deep links.
+    const route=location.hash.slice(1);
+    if(route==='practice') showPage('practice');
+    else if(route) {showPage('visualizer'); selectCategory(route);}
+
 
 })();
