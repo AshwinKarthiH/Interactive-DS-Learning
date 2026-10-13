@@ -1,0 +1,9 @@
+
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://interactive-ds-learning-dmbw.onrender.com/api/:path*"
+    }
+  ]
+}
