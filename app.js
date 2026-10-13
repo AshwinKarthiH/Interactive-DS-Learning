@@ -12,17 +12,10 @@
     const mobileMenu = document.getElementById('mobileMenu');
     const studentTab = document.getElementById('studentTab');
     const adminTab = document.getElementById('adminTab');
-    const loginModeTab = document.getElementById('loginModeTab');
-    const signupModeTab = document.getElementById('signupModeTab');
-    const nameGroup = document.getElementById('nameGroup');
     const authForm = document.getElementById('authForm');
-    const passwordToggle = document.getElementById('passwordToggle');
-    const passwordInput = document.getElementById('passwordInput');
-    const authSubmitText = document.getElementById('authSubmitText');
     const codeHighlight = document.getElementById('codeHighlight');
 
     let currentRole = 'student';
-    let currentMode = 'login';
 
     // --- Navbar Scroll Effect ---
     let lastScroll = 0;
@@ -39,6 +32,7 @@
         mobileMenuBtn.addEventListener('click', () => {
             mobileMenuBtn.classList.toggle('active');
             mobileMenu.classList.toggle('active');
+            mobileMenuBtn.setAttribute('aria-expanded', mobileMenu.classList.contains('active'));
         });
 
         // Close mobile menu on link click
@@ -46,6 +40,7 @@
             link.addEventListener('click', () => {
                 mobileMenuBtn.classList.remove('active');
                 mobileMenu.classList.remove('active');
+                mobileMenuBtn.setAttribute('aria-expanded', 'false');
             });
         });
     }
@@ -61,79 +56,13 @@
     if (studentTab) studentTab.addEventListener('click', () => setRoleTab('student'));
     if (adminTab) adminTab.addEventListener('click', () => setRoleTab('admin'));
 
-    // --- Auth Mode Tabs (Login/Signup) ---
-    function setModeTab(mode) {
-        currentMode = mode;
-        document.querySelectorAll('.mode-tab').forEach(tab => {
-            tab.classList.toggle('active', tab.dataset.mode === mode);
-        });
-        if (nameGroup) {
-            nameGroup.style.display = mode === 'signup' ? 'block' : 'none';
-        }
-        if (authSubmitText) {
-            authSubmitText.textContent = mode === 'login' ? "Let's get learning" : "Create my account";
-        }
-    }
-
-    if (loginModeTab) loginModeTab.addEventListener('click', () => setModeTab('login'));
-    if (signupModeTab) signupModeTab.addEventListener('click', () => setModeTab('signup'));
-
-    // --- Password Toggle ---
-    if (passwordToggle && passwordInput) {
-        passwordToggle.addEventListener('click', () => {
-            const isPassword = passwordInput.type === 'password';
-            passwordInput.type = isPassword ? 'text' : 'password';
-            passwordToggle.innerHTML = isPassword
-                ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
-                    <line x1="1" y1="1" x2="23" y2="23"/>
-                   </svg>`
-                : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                    <circle cx="12" cy="12" r="3"/>
-                   </svg>`;
-        });
-    }
-
-    // --- Auth Form Submit ---
-    if (authForm) {
-        authForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const email = document.getElementById('emailInput')?.value;
-            const password = passwordInput?.value;
-            const name = document.getElementById('nameInput')?.value;
-
-            // Store user data (demo — localStorage)
-            const userData = {
-                email,
-                role: currentRole,
-                name: name || email?.split('@')[0] || 'User',
-                loggedIn: true,
-                timestamp: Date.now(),
-            };
-            localStorage.setItem('algoverse_user', JSON.stringify(userData));
-
-            // Redirect based on role
-            const submitBtn = document.getElementById('authSubmit');
-            if (submitBtn) {
-                submitBtn.innerHTML = `
-                    <svg class="spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10" stroke-dasharray="30 60"/>
-                    </svg>
-                    <span>Getting ready...</span>
-                `;
-                submitBtn.style.pointerEvents = 'none';
-            }
-
-            setTimeout(() => {
-                if (currentRole === 'admin') {
-                    window.location.href = 'admin.html';
-                } else {
-                    window.location.href = 'dashboard.html';
-                }
-            }, 1200);
-        });
-    }
+    // Public demo profile selection, not account authentication.
+    if (authForm && !AlgoAPI.enabled) authForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const name = document.getElementById('nameInput').value.trim() || 'Guest';
+        AlgoStore.write('algoverse_user', {name, role:currentRole, demo:true});
+        window.location.href = currentRole === 'admin' ? 'admin.html' : 'dashboard.html';
+    });
 
     // --- Code Highlight Animation ---
     if (codeHighlight) {
@@ -215,10 +144,10 @@
                 email: 'nikitha@student.algoverse.io',
                 role: 'student',
                 name: 'Nikitha',
-                loggedIn: true,
+                demo: true,
                 timestamp: Date.now()
             };
-            localStorage.setItem('algoverse_user', JSON.stringify(studentData));
+            AlgoStore.write('algoverse_user', {...studentData, demo:true});
             window.location.href = 'dashboard.html';
         });
     }
@@ -231,31 +160,13 @@
                 email: 'dr.abc@algoverse.io',
                 role: 'admin',
                 name: 'Dr. ABC',
-                loggedIn: true,
+                demo: true,
                 timestamp: Date.now()
             };
-            localStorage.setItem('algoverse_user', JSON.stringify(adminData));
+            AlgoStore.write('algoverse_user', {...adminData, demo:true});
             window.location.href = 'admin.html';
         });
     }
-
-    // --- Social Auth Buttons (Demo) ---
-    ['googleAuth', 'githubAuth', 'discordAuth'].forEach(id => {
-        const btn = document.getElementById(id);
-        if (btn) {
-            btn.addEventListener('click', () => {
-                const userData = {
-                    email: 'demo@algoverse.io',
-                    role: 'student',
-                    name: 'Demo User',
-                    loggedIn: true,
-                    timestamp: Date.now(),
-                };
-                localStorage.setItem('algoverse_user', JSON.stringify(userData));
-                window.location.href = 'dashboard.html';
-            });
-        }
-    });
 
     // --- Initialize ---
     function init() {

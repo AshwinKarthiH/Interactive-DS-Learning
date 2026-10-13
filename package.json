@@ -1,0 +1,15 @@
+{
+  "name": "algoverse-learning-demo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "node test.cjs && node test-dsa.cjs && node test-code.cjs && node test-multilingual.cjs",
+    "test:browser": "node test-browser.cjs",
+    "test:visualizers": "node test-visualizers.cjs",
+    "test:studio": "node test-studio.cjs",
+    "test:languages": "node test-language-views.cjs",
+    "test:python": "python test-python.py",
+    "test:notes": "node test-notes.cjs",
+    "test:backend:browser": "node test-backend-browser.cjs"
+  }
+}

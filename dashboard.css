@@ -44,49 +44,6 @@
     --topbar-height: 64px;
 }
 
-/* === Light Mode Theme Overrides === */
-body.light-mode {
-    --bg-primary: #f8fafc;
-    --bg-secondary: #f1f5f9;
-    --bg-card: rgba(255, 255, 255, 0.92);
-    --bg-card-solid: #ffffff;
-    --bg-input: rgba(241, 245, 249, 0.9);
-    --text-primary: #0f172a;
-    --text-secondary: #475569;
-    --text-muted: #64748b;
-    --border-subtle: rgba(139, 92, 246, 0.15);
-    --border-hover: rgba(139, 92, 246, 0.35);
-}
-
-body.light-mode .sidebar {
-    background: #ffffff;
-    border-right: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-body.light-mode .topbar {
-    background: rgba(255, 255, 255, 0.9);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-body.light-mode .stat-card,
-body.light-mode .dash-card,
-body.light-mode .solver-panel,
-body.light-mode .problem-card,
-body.light-mode .visualizer-container,
-body.light-mode .battle-select-card {
-    background: #ffffff;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-}
-
-body.light-mode .subtopic-link:hover {
-    color: #0f172a;
-    background: rgba(0, 0, 0, 0.05);
-}
-
-body.light-mode .editor-area-wrapper {
-    background: #0f172a;
-}
-
 html { font-size: 16px; scroll-behavior: smooth; }
 body {
     font-family: var(--font-primary);

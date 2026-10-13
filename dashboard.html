@@ -9,8 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="dashboard.css">
-</head>
-<body>
+<link rel="stylesheet" href="usability.css"><link rel="stylesheet" href="dsa.css"><link rel="stylesheet" href="learning-studio.css"><link rel="stylesheet" href="drawing-sheet.css"><link rel="stylesheet" href="backend-ui.css"><link rel="stylesheet" href="clean-ui.css"><link rel="stylesheet" href="glass-background.css"></head>
+<body><p class="demo-notice">Local learning demo • Overview statistics and badges are sample data. Progress is saved in this browser. Practice runs JavaScript sample tests; other languages are unavailable.</p>
     <!-- Particle Canvas -->
     <canvas id="particleCanvas"></canvas>
 
@@ -57,72 +57,7 @@
             <div class="nav-section">
                 <span class="nav-section-label">TOPICS</span>
 
-                <!-- Sorting Group -->
-                <div class="topic-group open" data-group="sorting">
-                    <div class="topic-header" data-topic="sorting">
-                        <span class="topic-dot purple"></span>
-                        <span class="topic-title">Sorting</span>
-                        <svg class="topic-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-                    </div>
-                    <div class="topic-subdivision">
-                        <a href="#" class="subtopic-link" data-page="visualizer" data-topic="sorting" data-algo="bubble">Bubble Sort</a>
-                        <a href="#" class="subtopic-link" data-page="visualizer" data-topic="sorting" data-algo="selection">Selection Sort</a>
-                        <a href="#" class="subtopic-link" data-page="visualizer" data-topic="sorting" data-algo="insertion">Insertion Sort</a>
-                        <a href="#" class="subtopic-link" data-page="visualizer" data-topic="sorting" data-algo="merge">Merge Sort</a>
-                    </div>
-                </div>
-
-                <!-- Searching Group -->
-                <div class="topic-group" data-group="searching">
-                    <div class="topic-header" data-topic="searching">
-                        <span class="topic-dot cyan"></span>
-                        <span class="topic-title">Searching</span>
-                        <svg class="topic-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-                    </div>
-                    <div class="topic-subdivision">
-                        <a href="#" class="subtopic-link" data-page="visualizer" data-topic="searching" data-algo="linear">Linear Search</a>
-                        <a href="#" class="subtopic-link" data-page="visualizer" data-topic="searching" data-algo="binary">Binary Search</a>
-                    </div>
-                </div>
-
-                <!-- Stacks & Queues Group -->
-                <div class="topic-group" data-group="stack">
-                    <div class="topic-header" data-topic="stack">
-                        <span class="topic-dot pink"></span>
-                        <span class="topic-title">Stacks & Queues</span>
-                        <svg class="topic-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-                    </div>
-                    <div class="topic-subdivision">
-                        <a href="#" class="subtopic-link" data-page="visualizer" data-topic="stack" data-algo="stack">Stack (LIFO)</a>
-                        <a href="#" class="subtopic-link" data-page="visualizer" data-topic="stack" data-algo="queue">Queue (FIFO)</a>
-                    </div>
-                </div>
-
-                <!-- Trees Group -->
-                <div class="topic-group" data-group="tree">
-                    <div class="topic-header" data-topic="tree">
-                        <span class="topic-dot green"></span>
-                        <span class="topic-title">Trees</span>
-                        <svg class="topic-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-                    </div>
-                    <div class="topic-subdivision">
-                        <a href="#" class="subtopic-link" data-page="visualizer" data-topic="tree" data-algo="bst">Binary Search Tree</a>
-                        <a href="#" class="subtopic-link" data-page="visualizer" data-topic="tree" data-algo="bfs_tree">BFS Traversal</a>
-                    </div>
-                </div>
-
-                <!-- Linked Lists Group -->
-                <div class="topic-group" data-group="linkedlist">
-                    <div class="topic-header" data-topic="linkedlist">
-                        <span class="topic-dot orange"></span>
-                        <span class="topic-title">Linked Lists</span>
-                        <svg class="topic-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-                    </div>
-                    <div class="topic-subdivision">
-                        <a href="#" class="subtopic-link" data-page="visualizer" data-topic="linkedlist" data-algo="singly">Singly Linked List</a>
-                        <a href="#" class="subtopic-link" data-page="visualizer" data-topic="linkedlist" data-algo="doubly">Doubly Linked List</a>
-                    </div>
-                </div>
+                <div id="lessonNavigation"></div>
             </div>
         </nav>
         <div class="sidebar-footer">
@@ -155,9 +90,6 @@
                 <button class="topbar-btn" id="notifBtn" aria-label="Notifications">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                     <span class="notif-dot"></span>
-                </button>
-                <button class="topbar-btn" id="themeBtn" aria-label="Theme" title="Toggle Light / Dark mode">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                 </button>
             </div>
         </header>
@@ -369,168 +301,60 @@
 
         <!-- Page: DSA Visualizer -->
         <div class="page" id="pageVisualizer">
-            <div class="page-header">
-                <div>
-                    <h1 class="page-title">DSA <span class="text-gradient">Visualizer</span></h1>
-                    <p class="page-subtitle">Watch algorithms come alive. Select an algorithm to begin.</p>
-                </div>
+            <header class="lesson-heading">
+                <div><span class="lesson-eyebrow">DSA LEARNING STUDIO</span><h1 id="vizTitle">Bubble Sort</h1><p id="algoExplanation"></p></div>
+                <span class="viz-complexity" id="vizComplexity">O(n²)</span>
+            </header>
+            <details class="lesson-picker" id="lessonPicker">
+                <summary>Choose a topic or algorithm <span>35 interactive lessons</span></summary>
+                <div class="algo-categories" id="lessonCategories"></div>
+                <div class="algo-list" id="algoList"></div>
+            </details>
+            <div class="lesson-inputs studio-inputs">
+                <label id="valueControls">Your example<input id="valuesInput" value="18, 7, 25, 3, 12, 7" aria-label="Comma-separated example values"></label>
+                <label id="parameterControls"><span id="parameterLabel">Target</span><input id="searchTarget" type="number" value="40"></label>
+                <label id="textControls" hidden>Text to reverse<input id="stringInput" value="ALGORITHM" maxlength="100"></label>
+                <label id="graphControls" hidden>Edges (from-to:weight)<textarea id="graphInput" rows="2"></textarea></label>
+                <button class="viz-btn" id="applyExample">Apply example</button>
+                <div class="studio-options"><label for="sizeSlider">Example size</label><input type="range" min="5" max="25" value="10" id="sizeSlider"></div>
+                <p id="lessonError" class="lesson-error" role="alert"></p>
             </div>
-
-            <!-- Algorithm Selector -->
-            <div class="algo-categories">
-                <button class="algo-category active" data-category="sorting" id="catSorting">
-                    <span class="cat-icon">📊</span>
-                    <span>Sorting</span>
-                </button>
-                <button class="algo-category" data-category="searching" id="catSearching">
-                    <span class="cat-icon">🔍</span>
-                    <span>Searching</span>
-                </button>
-                <button class="algo-category" data-category="stack" id="catStack">
-                    <span class="cat-icon">📚</span>
-                    <span>Stack & Queue</span>
-                </button>
-                <button class="algo-category" data-category="linkedlist" id="catLinkedList">
-                    <span class="cat-icon">🔗</span>
-                    <span>Linked List</span>
-                </button>
-                <button class="algo-category" data-category="tree" id="catTree">
-                    <span class="cat-icon">🌳</span>
-                    <span>Trees</span>
-                </button>
+            <div class="learning-grid">
+                <section class="studio-panel whiteboard-panel" aria-labelledby="whiteboardHeading">
+                    <header class="studio-panel-header"><h2 id="whiteboardHeading">◈ Live whiteboard</h2><span>Follow the highlight</span></header>
+                    <div class="viz-canvas" id="vizCanvas"><div class="dsa-stage" id="vizBars"></div><div class="viz-empty-state hidden" id="vizEmpty"></div></div>
+                    <div class="board-legend"><span><i class="legend-current"></i>Current</span><span><i class="legend-finished"></i>Visited / finished</span></div>
+                </section>
+                <section class="studio-panel source-panel" aria-labelledby="sourceHeading">
+                    <header class="studio-panel-header"><h2 id="sourceHeading">&lt;/&gt; Code</h2><label class="sr-only" for="codeView">Programming language</label><select id="codeView"><option value="javascript">JavaScript</option><option value="python">Python</option><option value="c">C</option><option value="cpp">C++</option><option value="java">Java</option><option value="english">Plain English</option></select></header>
+                    <div id="lessonCode" class="lesson-source" tabindex="0" aria-label="Lesson code; the current operation is highlighted"></div>
+                    <p class="source-caption">The selected language follows the same algorithm and picture. <a id="languageSource" href="examples/algorithms.py" download hidden>Complete source</a></p>
+                </section>
+                <aside class="algorithm-column">
+                    <section class="studio-panel algorithm-panel" aria-labelledby="algorithmHeading">
+                        <header class="studio-panel-header"><h2 id="algorithmHeading">Algorithm, made simple</h2></header>
+                        <p class="lesson-analogy" id="lessonAnalogy"></p>
+                        <ol class="lesson-guide" id="lessonGuide"></ol>
+                        <div class="lesson-current"><strong>Happening now</strong><p id="stepNarration" role="status" aria-live="polite"></p></div>
+                    </section>
+                    <section class="studio-panel inspector-panel" aria-labelledby="inspectorHeading"><header class="studio-panel-header"><h2 id="inspectorHeading">Variable inspector</h2></header><dl id="lessonInspector"></dl></section>
+                </aside>
             </div>
-
-            <!-- Algorithm Sub-selector -->
-            <div class="algo-list" id="algoList">
-                <!-- Populated by JS -->
+            <div class="studio-playback" aria-label="Animation playback">
+                <button class="viz-btn" id="vizReset" title="Restart this example">↺ <span>Reset</span></button>
+                <button class="viz-btn" id="vizPrevious" title="Previous step" aria-label="Previous step">‹</button>
+                <button class="viz-btn primary" id="vizPlay">▶ <span>Play</span></button>
+                <button class="viz-btn" id="vizPause" disabled>Ⅱ <span>Pause</span></button>
+                <button class="viz-btn" id="vizStep" title="Next step">› <span>Step</span></button>
+                <label class="sr-only" for="vizTimeline">Move to an animation step</label><input id="vizTimeline" type="range" min="0" max="0" value="0">
+                <span class="timeline-counter"><span id="stepCurrent">0</span> / <span id="stepTotal">0</span></span>
+                <label class="sr-only" for="speedSlider">Playback speed</label><input type="range" min="1" max="100" value="25" id="speedSlider" title="Playback speed: slow to fast">
+                <button class="viz-btn" id="vizGenerate">New example</button>
             </div>
-
-            <!-- Visualizer Canvas -->
-            <div class="visualizer-container">
-                <div class="viz-header">
-                    <div class="viz-title-section">
-                        <h2 class="viz-title" id="vizTitle">Bubble Sort</h2>
-                        <span class="viz-complexity" id="vizComplexity">O(n²)</span>
-                    </div>
-                    <div class="viz-controls">
-                        <div class="speed-control">
-                            <label>Speed (Slow & Clear)</label>
-                            <input type="range" min="1" max="100" value="25" id="speedSlider">
-                        </div>
-                        <div class="size-control">
-                            <label>Size (Smaller Example)</label>
-                            <input type="range" min="5" max="25" value="10" id="sizeSlider">
-                        </div>
-                    </div>
-                </div>
-                <div class="viz-canvas" id="vizCanvas">
-                    <div class="viz-bars" id="vizBars">
-                        <!-- Bars generated by JS -->
-                    </div>
-                    <div class="viz-empty-state" id="vizEmpty">
-                        <div class="empty-icon">🎯</div>
-                        <h3>Select an algorithm to visualize</h3>
-                        <p>Choose from the categories above to see algorithms in action</p>
-                    </div>
-                </div>
-                <div class="viz-actions">
-                    <button class="viz-btn" id="vizGenerate">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
-                        Generate
-                    </button>
-                    <button class="viz-btn primary" id="vizPlay">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                        Play
-                    </button>
-                    <button class="viz-btn" id="vizPause" disabled>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
-                        Pause
-                    </button>
-                    <button class="viz-btn" id="vizStep">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
-                        Step
-                    </button>
-                    <button class="viz-btn" id="vizReset">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
-                        Reset
-                    </button>
-                </div>
-
-                <!-- Info Panel -->
-                <div class="viz-info-grid">
-                    <div class="viz-info-card">
-                        <h4>Algorithm Steps</h4>
-                        <div class="step-counter">
-                            <span id="stepCurrent">0</span>
-                            <span class="step-divider">/</span>
-                            <span id="stepTotal">0</span>
-                        </div>
-                    </div>
-                    <div class="viz-info-card">
-                        <h4>Comparisons</h4>
-                        <span class="info-value" id="infoComparisons">0</span>
-                    </div>
-                    <div class="viz-info-card">
-                        <h4>Swaps</h4>
-                        <span class="info-value" id="infoSwaps">0</span>
-                    </div>
-                    <div class="viz-info-card">
-                        <h4>Status</h4>
-                        <span class="info-status" id="infoStatus">Ready</span>
-                    </div>
-                </div>
-
-                <!-- Code Trace -->
-                <div class="code-trace-section">
-                    <div class="code-trace-header">
-                        <h3>Live Code Trace</h3>
-                        <div class="code-lang-tabs">
-                            <button class="lang-tab active">Python</button>
-                            <button class="lang-tab">JavaScript</button>
-                            <button class="lang-tab">C++</button>
-                        </div>
-                    </div>
-                    <div class="code-trace-body">
-                        <pre class="trace-code" id="traceCode"><code><span class="ln"> 1</span>  <span class="kw">def</span> <span class="fn">bubble_sort</span>(arr):
-<span class="ln"> 2</span>      n = <span class="fn">len</span>(arr)
-<span class="ln"> 3</span>      <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n):
-<span class="ln"> 4</span>          <span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span>(<span class="num">0</span>, n-i-<span class="num">1</span>):
-<span class="ln"> 5</span>              <span class="kw">if</span> arr[j] > arr[j+<span class="num">1</span>]:
-<span class="ln"> 6</span>                  arr[j], arr[j+<span class="num">1</span>] = arr[j+<span class="num">1</span>], arr[j]
-<span class="ln"> 7</span>      <span class="kw">return</span> arr</code></pre>
-                        <div class="trace-highlight" id="traceHighlight"></div>
-                    </div>
-                    <div class="trace-vars" id="traceVars">
-                        <div class="var-item"><span class="var-name">i</span><span class="var-value" id="varI">-</span></div>
-                        <div class="var-item"><span class="var-name">j</span><span class="var-value" id="varJ">-</span></div>
-                        <div class="var-item"><span class="var-name">arr[j]</span><span class="var-value" id="varAJ">-</span></div>
-                        <div class="var-item"><span class="var-name">arr[j+1]</span><span class="var-value" id="varAJ1">-</span></div>
-                    </div>
-                </div>
-
-                <!-- Explanation Panel -->
-                <div class="explanation-panel">
-                    <h3>How it works</h3>
-                    <p id="algoExplanation">Bubble Sort repeatedly steps through the list, compares adjacent elements, and swaps them if they are in the wrong order. The pass through the list is repeated until the list is sorted. Like bubbles rising to the surface, larger elements "bubble" to the end of the array with each pass.</p>
-                    <div class="complexity-grid">
-                        <div class="complexity-item">
-                            <span class="complexity-label">Best Case</span>
-                            <span class="complexity-value" id="bestCase">O(n)</span>
-                        </div>
-                        <div class="complexity-item">
-                            <span class="complexity-label">Average Case</span>
-                            <span class="complexity-value" id="avgCase">O(n²)</span>
-                        </div>
-                        <div class="complexity-item">
-                            <span class="complexity-label">Worst Case</span>
-                            <span class="complexity-value" id="worstCase">O(n²)</span>
-                        </div>
-                        <div class="complexity-item">
-                            <span class="complexity-label">Space</span>
-                            <span class="complexity-value" id="spaceComp">O(1)</span>
-                        </div>
-                    </div>
-                </div>
+            <div class="studio-metrics"><span>Comparisons <strong id="infoComparisons">0</strong></span><span>Changes / writes <strong id="infoSwaps">0</strong></span><span>Status <strong id="infoStatus">Ready</strong></span><span>Pictures show the state after the highlighted operation.</span></div>
+            <div class="studio-details-grid">
+                <section class="studio-panel step-explanation"><header class="studio-panel-header"><h2>Step explanation</h2><span id="explanationStep">Before we begin</span></header><p id="stepExplanation">Press Step to inspect one operation at a time.</p><pre id="traceCode" class="trace-code"></pre><div class="trace-vars" id="traceVars"><div class="var-item"><span class="var-name">index A</span><span class="var-value" id="varI">—</span></div><div class="var-item"><span class="var-name">index B</span><span class="var-value" id="varJ">—</span></div><div class="var-item"><span class="var-name">value A</span><span class="var-value" id="varAJ">—</span></div><div class="var-item"><span class="var-name">value B</span><span class="var-value" id="varAJ1">—</span></div></div></section>
+                <details class="studio-panel lesson-more"><summary>Why it works &amp; detailed algorithm</summary><p class="lesson-use" id="lessonUse"></p><p class="lesson-note" id="lessonNote"></p><p class="lesson-note" id="lessonCost"></p><div class="complexity-grid"><div class="complexity-item"><span class="complexity-label">Best</span><span id="bestCase"></span></div><div class="complexity-item"><span class="complexity-label">Average</span><span id="avgCase"></span></div><div class="complexity-item"><span class="complexity-label">Worst</span><span id="worstCase"></span></div><div class="complexity-item"><span class="complexity-label">Space</span><span id="spaceComp"></span></div></div><p class="lesson-note">A node stores a value. An edge connects nodes. A pivot is a reference value. Recursion repeats the steps on a smaller problem. A rotation moves a child into its parent's position while preserving the sorted order.</p></details>
             </div>
         </div>
 
@@ -751,10 +575,10 @@
                                 <span class="lang-dot"></span>
                                 <select id="editorLangSelect" class="lang-select">
                                     <option value="javascript">JavaScript (ES6)</option>
-                                    <option value="python">Python 3</option>
-                                    <option value="java">Java 17</option>
-                                    <option value="cpp">C++ (GCC)</option>
-                                    <option value="c">C (GCC)</option>
+                                    <option value="python" disabled>Python 3 — execution unavailable</option>
+                                    <option value="java" disabled>Java 17 — execution unavailable</option>
+                                    <option value="cpp" disabled>C++ (GCC) — execution unavailable</option>
+                                    <option value="c" disabled>C (GCC) — execution unavailable</option>
                                 </select>
                             </div>
                             <div class="editor-tools">
@@ -775,7 +599,7 @@
                         <div class="editor-action-bar">
                             <div class="action-status-indicator" id="testRunStatus">
                                 <span class="status-pulse-dot"></span>
-                                <span id="testRunStatusText">Ready to run</span>
+                                <span id="testRunStatusText" role="status" aria-live="polite">Ready to run</span>
                             </div>
                             <div class="action-buttons-group">
                                 <button class="btn-run-code" id="btnRunCode">
@@ -879,8 +703,8 @@
                     <div class="battle-viz" id="battleVizA"></div>
                     <div class="battle-stats">
                         <div class="battle-stat"><span>Comparisons</span><span id="battleCompA">0</span></div>
-                        <div class="battle-stat"><span>Swaps</span><span id="battleSwapA">0</span></div>
-                        <div class="battle-stat"><span>Time</span><span id="battleTimeA">0ms</span></div>
+                        <div class="battle-stat"><span>Array writes</span><span id="battleSwapA">0</span></div>
+                        <div class="battle-stat"><span>Median time (20 runs)</span><span id="battleTimeA">0ms</span></div>
                     </div>
                 </div>
                 <div class="battle-divider"></div>
@@ -889,8 +713,8 @@
                     <div class="battle-viz" id="battleVizB"></div>
                     <div class="battle-stats">
                         <div class="battle-stat"><span>Comparisons</span><span id="battleCompB">0</span></div>
-                        <div class="battle-stat"><span>Swaps</span><span id="battleSwapB">0</span></div>
-                        <div class="battle-stat"><span>Time</span><span id="battleTimeB">0ms</span></div>
+                        <div class="battle-stat"><span>Array writes</span><span id="battleSwapB">0</span></div>
+                        <div class="battle-stat"><span>Median time (20 runs)</span><span id="battleTimeB">0ms</span></div>
                     </div>
                 </div>
             </div>
@@ -1076,6 +900,9 @@
     <div class="click-ripple" id="clickRipple"></div>
 
     <script src="particles.js"></script>
-    <script src="dashboard.js"></script>
-</body>
+    <script src="backend-client.js"></script><script src="storage.js"></script><script src="algorithm-core.js"></script><script src="battle-core.js"></script><script src="problems.js"></script><script src="runner.js"></script><script src="lessons.js"></script><script src="dsa-core.js"></script><script src="dsa-view.js"></script><script src="lesson-navigation.js"></script><script src="multilingual-code.js"></script><script src="lesson-code.js"></script><script src="dashboard.js"></script><script src="drawing-sheet.js"></script>
+<script src="backend-dashboard.js"></script><script src="backend-quizzes.js"></script><script src="backend-coaching.js"></script><script src="clean-ui.js"></script></body>
 </html>
+
+
+
