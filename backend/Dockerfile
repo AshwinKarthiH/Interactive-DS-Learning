@@ -19,4 +19,4 @@ COPY --from=build /app/target/lib/ ./lib/
 
 EXPOSE 10000
 
-CMD ["java", "-cp", "app.jar:lib/*", "com.algoverse.Application"]
+CMD ["java", "-Xms64m", "-Xmx256m", "-XX:MaxMetaspaceSize=128m", "-XX:ReservedCodeCacheSize=64m", "-cp", "app.jar:lib/*", "com.algoverse.Application", "--debug"]
